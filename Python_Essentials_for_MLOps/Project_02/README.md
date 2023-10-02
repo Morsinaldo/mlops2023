@@ -128,12 +128,22 @@ O último passo da DAG é chamado de `transcribe_episodes()` e é responsável p
 
 O primero passo é criar um ambiente virtual com no máximo a versão 3.10 do Python, pois o airflow ainda não oferece suporte para a 3.11. Neste caso, eu utilizei a versão 3.10 e você pode fazer isso utilizando o comando 
 ```
-venv -m 
+python3.10 -m venv airflow
 ```
 
+Para ativar o ambiente, execute o comando:
+
 ```
-python movie_recomendation.py --movie_title "movie_title"
+source ./airflow/bin/activate
 ```
+
+Para instalar as dependências necessárias, utilize o comando `pip`:
+
+```
+pip install -r requirements.txt
+```
+
+Depois disso, precisamos realizar o download e a configuração do SQLite. Para isso, rode o comando abaixo ou realize o download diretamente do [site]()
 
 ### Execution Example
 
