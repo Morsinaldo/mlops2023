@@ -1,0 +1,8 @@
+pandas==2.1.1
+xmltodict==0.13.0
+vosk==0.3.45
+pydub==0.25.1
+pytest==7.4.2
+pytest-sugar==0.9.7
+pylint==3.0.0
+python-dotenv-1.0.0
