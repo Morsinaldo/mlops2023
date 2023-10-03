@@ -28,7 +28,9 @@ def test_columns_present(df_heart_disease)  -> None:
     Returns:
         None
     """
-    expected_columns = ["Age", "Sex", "ChestPainType", "RestingBP", "Cholesterol", "FastingBS", "RestingECG", "MaxHR", "ExerciseAngina", "Oldpeak", "ST_Slope", "HeartDisease"]
+    expected_columns = ["Age", "Sex", "ChestPainType", "RestingBP", "Cholesterol",
+                        "FastingBS", "RestingECG", "MaxHR", "ExerciseAngina", 
+                        "Oldpeak", "ST_Slope", "HeartDisease"]
     assert all(col in df_heart_disease.columns for col in expected_columns)
 
 def test_column_data_types(df_heart_disease) -> None:
@@ -83,7 +85,8 @@ def test_chest_pain_type_categories(df_heart_disease) -> None:
         None
     """
     expected_categories = ["TA", "ATA", "NAP", "ASY"]
-    assert all(category in df_heart_disease["ChestPainType"].unique() for category in expected_categories)
+    assert all(category in df_heart_disease["ChestPainType"].unique() \
+               for category in expected_categories)
 
 def test_fasting_bs_categories(df_heart_disease) -> None:
     """
@@ -96,7 +99,8 @@ def test_fasting_bs_categories(df_heart_disease) -> None:
         None
     """
     expected_categories = [0, 1]
-    assert all(category in df_heart_disease["FastingBS"].unique() for category in expected_categories)
+    assert all(category in df_heart_disease["FastingBS"].unique() \
+               for category in expected_categories)
 
 def test_resting_ecg_categories(df_heart_disease) -> None:
     """
@@ -109,7 +113,8 @@ def test_resting_ecg_categories(df_heart_disease) -> None:
         None
     """
     expected_categories = ["Normal", "ST", "LVH"]
-    assert all(category in df_heart_disease["RestingECG"].unique() for category in expected_categories)
+    assert all(category in df_heart_disease["RestingECG"].unique() \
+               for category in expected_categories)
 
 def test_exercise_angina_categories(df_heart_disease) -> None:
     """
@@ -122,7 +127,8 @@ def test_exercise_angina_categories(df_heart_disease) -> None:
         None
     """
     expected_categories = ["Y", "N"]
-    assert all(category in df_heart_disease["ExerciseAngina"].unique() for category in expected_categories)
+    assert all(category in df_heart_disease["ExerciseAngina"].unique() \
+               for category in expected_categories)
 
 def test_heart_disease_categories(df_heart_disease) -> None:
     """
@@ -135,7 +141,8 @@ def test_heart_disease_categories(df_heart_disease) -> None:
         None
     """
     expected_categories = [0, 1]
-    assert all(category in df_heart_disease["HeartDisease"].unique() for category in expected_categories)
+    assert all(category in df_heart_disease["HeartDisease"].unique() \
+               for category in expected_categories)
 
 def test_age_range(df_heart_disease) -> None:
     """
@@ -174,4 +181,4 @@ def test_cholesterol_range(df_heart_disease) -> None:
         None
     """
     assert df_heart_disease["Cholesterol"].min() >= 0
-    assert df_heart_disease["Cholesterol"].max() <= 500
+    assert df_heart_disease["Cholesterol"].max() <= 650

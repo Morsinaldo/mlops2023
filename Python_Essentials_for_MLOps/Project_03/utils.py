@@ -24,12 +24,13 @@ def eda_heart_disease(df: pd.DataFrame) -> None:
     Returns:
         None
     """
-    logging.info(f"Columns type \n {df.dtypes}")
-    logging.info(f"Describe of numerical features \n {df.describe()}")
+    logging.info("Columns type \n %s", df.dtypes)
+    logging.info("Describe of numerical features \n %s", df.describe())
 
-    logging.info(f"Missing values in dataset: {df.isna().sum()}")
+    logging.info("Missing values in dataset: %s", df.isna().sum())
 
-    categorical_cols = ["Sex", "ChestPainType", "FastingBS", "RestingECG", "ExerciseAngina", "ST_Slope", "HeartDisease"]
+    categorical_cols = ["Sex", "ChestPainType", "FastingBS", "RestingECG",
+                        "ExerciseAngina", "ST_Slope", "HeartDisease"]
 
     fig = plt.figure(figsize=(16, 15))
 
@@ -44,6 +45,8 @@ def eda_heart_disease(df: pd.DataFrame) -> None:
     plt.savefig("./images/categorial_features_proportion.png")
 
     fig = plt.figure(figsize=(16,15))
+
+    fig.suptitle("Proportion of categorical features grouped by HeartDisease", fontsize=16)
 
     for idx, col in enumerate(categorical_cols[:-1]):
         ax = plt.subplot(4, 2, idx+1)
@@ -70,21 +73,24 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
 
     # only keep non-zero values for RestingBP
     df_clean = df[df["RestingBP"] != 0]
-    logging.info(f"Dataset has {df_clean.shape[0]} non-zero values for RestingBP")
+    logging.info("Dataset has %s non-zero values for RestingBP", df_clean.shape[0])
 
     # get the lines where HeartDisease is 0
     df_heartdisease_mask = df_clean["HeartDisease"]==0
-    logging.info(f"Dataset has {df_heartdisease_mask.sum()} lines where HeartDisease is 0")
+    logging.info("Dataset has %s lines where HeartDisease is 0", df_heartdisease_mask.sum())
 
     # filter the lines where HeartDisease is 0
     df_cholesterol_without_heartdisease = df_clean.loc[df_heartdisease_mask, "Cholesterol"]
     df_cholesterol_with_heartdisease = df_clean.loc[~df_heartdisease_mask, "Cholesterol"]
 
-    logging.info(f"Replace the zero values with the median of the respective group")
+    logging.info("Replace the zero values with the median of the respective group")
     # replace the zero values with the median of the respective group
-    df_clean.loc[df_heartdisease_mask, "Cholesterol"] = df_cholesterol_without_heartdisease.replace(to_replace = 0, value = df_cholesterol_without_heartdisease.median())
-    df_clean.loc[~df_heartdisease_mask, "Cholesterol"] = df_cholesterol_with_heartdisease.replace(to_replace = 0, value = df_cholesterol_with_heartdisease.median())
+    median_cwh = df_cholesterol_without_heartdisease.median()
+    df_clean.loc[df_heartdisease_mask, "Cholesterol"] = \
+        df_cholesterol_without_heartdisease.replace(to_replace = 0, value = median_cwh)
+    df_clean.loc[~df_heartdisease_mask, "Cholesterol"] = \
+        df_cholesterol_with_heartdisease.replace(to_replace = 0, value = median_cwh)
 
-    logging.info(f"Describe of RestingDB and Cholesterol \n {df_clean.describe()}")
+    logging.info("Describe of RestingDB and Cholesterol \n %s", df_clean.describe())
 
     return df_clean

@@ -11,13 +11,13 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from utils import eda_heart_disease, clean_data
-
 from skopt import BayesSearchCV
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
+
+from utils import eda_heart_disease, clean_data
 
 # set the logging level
 logging.basicConfig(level=logging.INFO,
@@ -28,8 +28,10 @@ logging.basicConfig(level=logging.INFO,
 parser = argparse.ArgumentParser(description="Heart Disease Prediction")
 
 # add the arguments
-parser.add_argument("--test_size", type=float, default=0.2, help="The proportion of the dataset to include in the test split")
-parser.add_argument("--hyperparameter_tuning", type=bool, default=False, help="Whether to perform hyperparameter tuning or not")
+parser.add_argument("--test_size", type=float,
+                    default=0.2, help="The proportion of the dataset to include in the test split")
+parser.add_argument("--hyperparameter_tuning", type=bool,
+                    default=False, help="Whether to perform hyperparameter tuning or not")
 
 # parse the arguments
 args = parser.parse_args()
@@ -37,8 +39,11 @@ args = parser.parse_args()
 # read the data
 try:
     df_heart_disease = pd.read_csv('./data/heart_disease_prediction.csv')
-except Exception as e:
-    logging.error("Error loading data")
+except FileNotFoundError as e:
+    logging.error("FileNotFoundError during data loading. Check if the data file is available")
+    logging.error(e)
+except pd.errors.EmptyDataError as e:
+    logging.error("EmptyDataError during data loading. The CSV file is empty or corrupt.")
     logging.error(e)
 
 # EDA
@@ -47,21 +52,21 @@ try:
     if not os.path.exists("images"):
         os.makedirs("images")
     eda_heart_disease(df_heart_disease)
-except Exception as e:
-    logging.error("Error during EDA")
+except FileNotFoundError as e:
+    logging.error("FileNotFoundError during EDA. Check if the required files are available.")
     logging.error(e)
 
 # Data Cleaning
 try:
     logging.info("Starting data cleaning")
     df_heart_disease = clean_data(df_heart_disease)
-except Exception as e:
-    logging.error("Error during data cleaning")
+except ValueError as e:
+    logging.error("ValueError during data cleaning. Check if columns have the correct values.")
     logging.error(e)
 
 # Feature selection
 df_heart_disease = pd.get_dummies(df_heart_disease, drop_first=True)
-logging.info(f"Dataset after one-hot encoding \n {df_heart_disease.head()}")
+logging.info("Dataset after one-hot encoding \n %s", df_heart_disease.head())
 
 # plot the correlation matrix
 fig = plt.figure(figsize=(16, 15))
@@ -99,11 +104,11 @@ logging.info("Evaluating the model")
 accuracy = accuracy_score(y_test, y_pred)
 logging.info("The accuracy of the model is %s", accuracy)
 
-if args.hyperparameter_tuning == True:
+if args.hyperparameter_tuning is True:
     # define the hyperparameters
-    hyperparameters = dict(n_neighbors=[1, 3, 5, 7, 9, 11, 13, 15],
-                           weights=["uniform", "distance"],
-                           metric=["euclidean", "manhattan", "minkowski"])
+    hyperparameters = {"n_neighbors": [1, 3, 5, 7, 9, 11, 13, 15],
+                          "weights": ["uniform", "distance"],
+                          "metric": ["euclidean", "manhattan", "minkowski"]}
 
     # define the search
     logging.info("Instantiating the search")
