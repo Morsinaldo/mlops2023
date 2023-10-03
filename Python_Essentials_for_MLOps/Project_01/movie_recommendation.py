@@ -5,60 +5,56 @@ Date: 2023-09-26
 """
 # import libraries
 import os
+import zipfile
 import argparse
 import logging
-import tqdm
 import requests
 import pandas as pd
+from dotenv import load_dotenv
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-from utils import clean_movie_title, get_most_similar_movies_by_title, find_similar_movies
+from utils import clean_movie_title, get_most_similar_movies_by_title, \
+                 find_similar_movies, download_data
 
 # set the logging level
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
-# read the data
-try:
-    if not os.path.exists("data"):
-        logging.info("Downloading the data")
-
-        # use tqdm to show the progress bar
-        r = requests.get("https://files.grouplens.org/datasets/movielens/ml-25m.zip",
-                         stream=True, timeout=5)
-        total_size = int(r.headers.get("content-length", 0))
-        BLOCK_SIZE = 1024
-        t = tqdm.tqdm(total=total_size, unit="iB", unit_scale=True)
-
-        with open("data/ml-25m.zip", "wb") as f:
-            for data in r.iter_content(BLOCK_SIZE):
-                t.update(len(data))
-                f.write(data)
-
-        t.close()
-    else:
-        raise Exception("The data has already been downloaded")
-
-except Exception as e:
-    logging.error("Download failed")
-    logging.error(e)
+load_dotenv()
 
 # create the parser
 parser = argparse.ArgumentParser(description="Movie Recommendation System")
 
 # add the arguments
-parser.add_argument("--movie_title", type=str, help="The title of the movie")
+parser.add_argument("--movie-title", type=str, help="The title of the movie")
 
 # parse the arguments
 args = parser.parse_args()
 
 # get the movie title
-movie_title = args.movie_title
+movie_title = args.movie_title\
+
+# read the data
+try:
+    if not os.path.exists("ml-25m"):
+        logging.info("Downloading the data")
+
+        download_data(os.getenv("URL"), os.getenv("ZIP_FILENAME"))
+    else:
+        logging.info("The data is already downloaded")
+except requests.exceptions.ConnectionError:
+    logging.error("Connection Error")
+except requests.exceptions.Timeout:
+    logging.error("Timeout Error")
+except requests.exceptions.HTTPError:
+    logging.error("HTTP Error")
+except zipfile.BadZipFile:
+    logging.error("The downloaded file is not a valid ZIP file.")
 
 # import the data
 logging.info("Importing the data")
-movies_df = pd.read_csv("data/movies.csv")
+movies_df = pd.read_csv("ml-25m/movies.csv")
 
 # log the shape of the data
 logging.info("The shape of the data is %s", movies_df.shape)
@@ -85,9 +81,11 @@ for index, row in results.iterrows():
     print("")
 
 # read the ratings data
-ratings_df = pd.read_csv("data/ratings.csv")
+ratings_df = pd.read_csv("ml-25m/ratings.csv")
 
-results = find_similar_movies(movies_df, ratings_df, movie_title)
+logging.info("Finding similar by user ratings")
+
+results = find_similar_movies(movies_df, ratings_df, results.iloc[0]["title"])
 
 # print the results
 for index, row in results.iterrows():
