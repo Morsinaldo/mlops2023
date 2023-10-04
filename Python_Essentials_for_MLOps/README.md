@@ -2,15 +2,71 @@
 
 Antes de iniciar no fabuloso mundo das operações de Machine Learning (MLOps), existem um conjunto de boas práticas a serem seguidas que facilitam a legibilidade e a manutenção do código. Afinal, em um projeto real com um modelo em produção, caso um erro aconteça, outros desenvolvedores irão ler o seu código para poder identificar o problema. Uma identação padronizada e loggings são muito úteis neste ponto. Ou ainda, se você precisa retreinar o modelo e a base de dados precisa ser tratada, verificar se não há nenhuma coluna inválida, se o número de instâncis é suficiente, entre outros. Nesse sentido, testes unitários podem facilitar bastante este processo. 
 
-Com isso em vista, foram desenvolvidos três projetos com o intuito de explorar algumas dessas melhores práticas, as quais serão explicadas em mais detalhes abaixo.
+![alt text](./images/header.png)
+
+Com isso em vista, foram desenvolvidos três projetos com o intuito de explorar algumas dessas melhores práticas, as quais serão explicadas em mais detalhes abaixo. Você também pode conferir [meu vídeo]() explicando de forma geral o funcionamento de cada projeto.
 
 ## Projetos Desenvolvidos
-   - [Video System Recomendation](./Project_01/): Inserir descrição
-   - [Airflow Data Pipeline to Download Podcasts](./Project_02/): Inserir descrição
-   - [Project 03](./Project_03/): Inserir descrição
+   - [Movie System Recomendation](./Project_01/): Neste projeto, foi desenvolvido um sistema de recomendação de filmes no qual o usuário fornece um título e o algoritmo irá realizar uma busca pelos nomes de filmes mais parecidos na sua base de dados e com isso, realizar uma recomendação de filmes baseada nas opniões de outros usuários com gostos semelhnates.
+   - [Airflow Data Pipeline to Download Podcasts](./Project_02/): Neste projeto, foi desenvolvido um pipeline baseado em grafos utilizando o airflow para a extração automática de arquivos de podcasts.
+   - [Predicting Heart Disease](./Project_03/): Neste projeto, foi desenvolvido um scritp para automatizar o treinamento de um modelo capaz de prever doenças cardíacas com base nos dados clínicos de um paciente. O usuário pode ainda definir se deseja realizar a busca pelos melhores hiperparâmetros e pode definir a porcentagem da base que será utilizada para teste.
+
+## Requirements/Tecnologies
+
+- Python 3.8+
+- Python packages: 
+   - airflow
+   - pylint
+   - tqdm
+   - pytest
+   - pytest-sugar
+   - requests
+   - numpy
+   - pandas
+   - xmltodict
+   - python-dotenv
+
+   Você pode encontrar a lista completa com as respectis versões no arquivo [requirements.txt](./requirements.txt)
+
+## Instalation Instructions
+
+1. Ensure you have Python version 3.8+ installed.
+2. Clone the repository: 
+   ```
+   git clone https://github.com/Morsinaldo/mlops2023.git
+   ```
+3. Navigate to the `Python_Essentials_for_MLOps` directory.
+   ```
+   cd Python_Essentials_for_MLOps
+   ```
+4. Install the required libraries: 
+   ```
+   pip install -r requirements.txt
+   ``` 
+5. Navigate to a specific project, [Project 01](./Project_01/), for example.
+   ```
+   cd Project 01
+   ```
+6. Run the project:
+   ```
+   python movie_recommendations.py --movie-title "Movie Title"
+   ```
+   replacing `Movie Title` with the title of the movie you want to get recommendations for.
+6. To run the tests, run the following command:
+   ```
+    pytest 
+   ```
+7. To run the linter, run the following command:
+   ```
+    pylint movie_recommendations.py
+   ```
+8. Alternatively, you can use **GitHub Codespaces** for a quick setup:
+   - In the main repository page, click on the `Code` button and select `Codespaces`.
+   - From the dropdown, select `Open with Codespaces` or `Create codespace on main`.
+   - This will initiate a Codespace environment where you can code directly in the browser without local setup.
 
 
-## Melhores práticas
+## Some best Practices
 
 ### Virtual Environment
 
@@ -59,7 +115,7 @@ Este ponto é muito importante, pois no cenário de produção muito erros podem
    - Resource Exhaustion: Imagine um modelo de aprendizado de máquina que realiza recomendação de produtos em um site de comércio eletrônico. Se o modelo apresentar um erro que não foi tratado adequadamente em um horário de pico de vendas, isso resultará em uma perda significativa de receita.
    - Timeout Errors: Poor handling of timeout errors can cascade, causing a failure in multiple dependent systems. Quanto mais completo o pipeline, maior o prejuízo que poderá ser causado.
 
-EM face disso, o python fornece uma [documentação](https://docs.python.org/3/tutorial/errors.html) sobre este ponto, tanto os tratamentos mais padrões quanto tratamentos customizados.
+Em face disso, o python fornece uma [documentação](https://docs.python.org/3/tutorial/errors.html) sobre este ponto, tanto os tratamentos mais padrões quanto tratamentos customizados.
 
 
 ### Pytest
@@ -84,7 +140,21 @@ Once the ML has been deployed, it need to be monitored. Uma das formas mais eleg
    - WARNING: an indication that something unexpected happened or may happen soon but the program still works as expected 
    - ERROR: due to a severe problem, the software has not been able to perform some function
    - CRITICAL: a very severe error that will likely lead to the application terminating
- 
+
+### Extra readings
 As práticas acima são apenas a ponta do iceberg nesse mundo de MLOps. Existem muitas que podem ser incorporadas dependendo do objetivo do seu projeto, da cultura da sua empresa, entre outras coisas. Como sugestão de leitura, caso você queira se aprofundar neste tema, destacam-se as seguintes referências:
-   - Clean Architecture in Python
+
+   - [Clean Code in Python](https://www.amazon.com/Clean-Code-Python-maintainable-efficient/dp/1800560214/ref=sr_1_1?crid=T8VO8D93FZQP&keywords=clean+code+in+python&qid=1696419564&sprefix=clean+code+in+%2Caps%2C196&sr=8-1)
+   - [Clean Architecture](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164/ref=sr_1_1?crid=B68I1FZKKCOM&keywords=clean+architecture&qid=1696419582&sprefix=clean+a%2Caps%2C240&sr=8-1)
+   - [Conventional Commits](https://gist.github.com/qoomon/5dfcdf8eec66a051ecd85625518cfd13)
    
+## Extras
+
+- Certificate of completion for the course: [Intermediate Python for Web Development]().
+- Explanaiton video: [Loom]().
+## References
+
+- [Ivanovitch's Repository](https://github.com/ivanovitchm/mlops)
+- [Build a Movie Recommendation System in Python (Dataquest)](https://github.com/dataquestio/project-walkthroughs/blob/master/movie_recs/movie_recommendations.ipynb)
+- [Build an Airflow Data Pipeline to Download Podcasts (Dataquest)](https://github.com/dataquestio/project-walkthroughs/blob/master/podcast_summary/podcast_summary.py)
+- [Guided Project: Predicting Heart Disease (Dataquest)](https://github.com/dataquestio/solutions/blob/master/Mission740Solutions.ipynb)

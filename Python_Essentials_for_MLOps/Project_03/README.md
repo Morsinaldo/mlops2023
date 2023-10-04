@@ -7,6 +7,31 @@ Numerous risk factors may be conducive to the onset of CVD in an individual, inc
 
 In this project, we will use the [Kaggle dataset](https://www.kaggle.com/datasets/fedesoriano/heart-failure-prediction/) and build a K-Nearest Neighbors classifier to accurately predict the likelihood of a patient having a heart disease in the future.
 
+## How to execute
+
+Uma vez que você já tenha criado o ambiente virtual de sua preferência e instalado as dependências, basta você ativá-lo e executar o comando abaixo.
+
+```
+python main.py
+```
+
+Para permitir uma maior flexibilidade da utilzação do script através da linha de comando, ele permite a passagem de dois parâmetros:
+
+- test_size: permite que o usuário defina a proporção que será utilizada para o conjunto de teste durante o treinamento. Aceita valores do tipo float entre 0 e 1. Default: 0.2
+- hyperparameter_tuning: permite que o usuário defina se deseja realizar a busca bayesiana pelo melhores hyperparâmetros do modelo. Aceita valores True or False. Default: False
+
+### Execution Example
+
+Supondo que você deseja uma proporção de 15% para teste e deseja realizar o hyperaparameter tuning
+
+```
+python main.py --test_size 0.15 --hyperparameter_tuning True
+```
+
+O print do final da saída do código deve ser parecida com essa:
+
+![alt text](./images/execution.png)
+
 ## The code
 
 No arquivo [main.py](./main.py), foi utilizada a arquitetura `try - except` para realizar a leitura do dataset, a análise exploratória dos dados (EDA) e a limpeza das features. As funcões auxiliares utilizadas no script encontram-se no arquivo [utils.py](./utils.py) e o código mencionado encontra-se abaixo.
@@ -116,30 +141,8 @@ if args.hyperparameter_tuning == True:
     accuracy = accuracy_score(y_test, y_pred)
 ```
 
-## How to execute
 
-Uma vez que você já tenha criado o ambiente virtual de sua preferência e instalado as dependências, basta você ativá-lo e executar o comando abaixo.
-
-```
-python main.py
-```
-
-Para permitir uma maior flexibilidade da utilzação do script através da linha de comando, ele permite a passagem de dois parâmetros:
-
-- test_size: permite que o usuário defina a proporção que será utilizada para o conjunto de teste durante o treinamento. Aceita valores do tipo float entre 0 e 1. Default: 0.2
-- hyperparameter_tuning: permite que o usuário defina se deseja realizar a busca bayesiana pelo melhores hyperparâmetros do modelo. Aceita valores True or False. Default: False
-
-### Execution Example
-
-Supondo que você deseja uma proporção de 15% para teste e deseja realizar o hyperaparameter tuning
-
-```
-python main.py --test_size 0.15 --hyperparameter_tuning True
-```
-
-## Pytest
-
-### How to add more data
+## How to add more data (Pytest)
 
 A cada dia novos dados são gerados e, com isso, é desejável manter a nossa base de dados atualizada não é? Então, se você deseja fazer isso sem compromenter a exeução correta do código, eu criei alguns testes que irão amenizar a chance de ocorrer algum problema durante a execução. 
 
@@ -150,6 +153,17 @@ Para executar os testes, basta você rodar o comando abaixo:
 ```
 pytest
 ```
+
+Para executar algum arquivo de teste específico, você pode passar o nome do arquivo, por exemplo:
+
+```
+pytest test/test_data.py
+```
+
+O resultado da execução deste comando pode ser visualizado na imagem abaixo:
+
+![alt text](./images/pytest.png)
+
 
 ## Clean codes Principles
 
@@ -190,15 +204,27 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df_clean
 ```
 
-## Code style
+Note que eu tentei deixar o nome das variáveis da forma mais legível possível, bem como os nomes dos testes. Em adição à docstring, o código ficou mais limpo e mais legível, melhorando assim a sua legibilidade. Em relação ao Pylint, eu consegui uma nota 10/10. Não fique tão obcecado em alcançar a nota máxima. É preciso ter bom censo e ser crítico em relação à algumas coisas como a quantidade de espaços na identação, pois dependendo da resolução da tela que você está olhando, dois espaços podem ser mais interessantes do que quatro. 
 
-Em relação à estilização do código, com o AutoPep8, eu consegui uma nota X/10 no arquivo [main.py](./main.py). Não fique tão obcecado em alcançar a nota 10. É preciso ter bom censo e ser crítico em relação à algumas coisas como a quantidade de espaços na identação, pois dependendo da resolução da tela que você está olhando, dois espaços podem ser mais interessantes do que quatro. 
-
-Para executar o AutoPep8, basta você rodar o seguinte comando:
+Para executar o Pylint, basta você rodar o seguinte comando:
 
 ```
-Colocar o comando do AutoPep8
+pylint filename
 ```
+
+Abaixo encontram-se alguns exemplos de execução e os seus resultados:
+
+- ```pylint movie_recomendation.py```
+
+![alt text](./images/pylint_01.png)
+
+- ```pylint conftest.py```
+
+![alt text](./images/pylint_02.png)
+
+- ```pylint utils.py```
+
+![alt text](./images/pylint_03.png)
 
 ## Copyrights
 
