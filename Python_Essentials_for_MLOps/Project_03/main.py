@@ -36,6 +36,15 @@ parser.add_argument("--hyperparameter_tuning", type=bool,
 # parse the arguments
 args = parser.parse_args()
 
+# verify if the arguments are valid
+if args.test_size <= 0 or args.test_size >= 1:
+    logging.error("The test size must be between 0 and 1")
+    exit(1)
+
+if isinstance(args.hyperparameter_tuning, bool) is False:
+    logging.error("The hyperparameter tuning argument must be a boolean")
+    exit(1)
+
 # read the data
 try:
     df_heart_disease = pd.read_csv('./data/heart_disease_prediction.csv')

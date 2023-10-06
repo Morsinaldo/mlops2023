@@ -33,7 +33,7 @@ parser.add_argument("--movie-title", type=str, help="The title of the movie")
 args = parser.parse_args()
 
 # get the movie title
-movie_title = args.movie_title\
+movie_title = args.movie_title
 
 # read the data
 try:
