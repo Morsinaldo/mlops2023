@@ -6,16 +6,14 @@ Date: 2023-09-30
 # import libraries
 import os
 import json
+import logging
+import pendulum
 import requests
 import xmltodict
-import logging
 import pandas as pd
 
 from airflow.decorators import dag, task
-import pendulum
-from airflow.providers.sqlite.operators.sqlite import SqliteOperator
-# from airflow.providers.sqlite.operators.sqlite import SQLExecuteQueryOperator
-
+from airflow.providers.sqlite.operators.sqlite import SQLExecuteQueryOperator
 from airflow.providers.sqlite.hooks.sqlite import SqliteHook
 
 from vosk import Model, KaldiRecognizer
@@ -23,7 +21,8 @@ from pydub import AudioSegment
 
 # set constants
 PODCAST_URL = "https://www.marketplace.org/feed/podcast/marketplace/"
-EPISODE_FOLDER = "/Users/morsinaldo/Desktop/mlops2023/Python_Essentials_for_MLOps/Project_02/dags/episodes"
+PROJECT_FOLDER = "/Users/morsinaldo/Desktop/mlops2023/Python_Essentials_for_MLOps/Project_02"
+EPISODE_FOLDER = PROJECT_FOLDER + "/dags/episodes"
 FRAME_RATE = 16000
 
 # set the logging level
@@ -31,14 +30,15 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(levelname)s %(message)s',
                     datefmt='%m/%d/%Y %I:%M:%S %p')
 
-def create_database() -> SqliteOperator:
+def create_database() -> SQLExecuteQueryOperator:
     """
     Creates the database table.
 
     Returns:
-        create_database (SqliteOperator): An Airflow operator for creating the database table.
+        create_database (SQLExecuteQueryOperator): An Airflow operator for 
+            creating the database table.
     """
-    return SqliteOperator(
+    return SQLExecuteQueryOperator(
         task_id='create_table_sqlite',
         sql=r"""
         CREATE TABLE IF NOT EXISTS episodes (
@@ -50,7 +50,7 @@ def create_database() -> SqliteOperator:
             transcript TEXT
         );
         """,
-        sqlite_conn_id="podcasts"
+        conn_id="podcasts"
     )
 
 
@@ -112,10 +112,20 @@ def load_data(episodes: list) -> list:
         for episode in episodes:
             if episode["link"] not in stored_episodes["link"].values:
                 filename = f"{episode['link'].split('/')[-1]}.mp3"
-                new_episodes.append([episode["link"], episode["title"], episode["pubDate"], episode["description"], filename])
+                new_episodes.append([episode["link"],
+                                     episode["title"],
+                                     episode["pubDate"],
+                                     episode["description"],
+                                     filename])
 
         # insert new episodes into the database
-        hook.insert_rows(table='episodes', rows=new_episodes, target_fields=["link", "title", "published", "description", "filename"])
+        hook.insert_rows(table='episodes',
+                         rows=new_episodes,
+                         target_fields=["link",
+                                        "title",
+                                        "published",
+                                        "description",
+                                        "filename"])
         logging.info("Loaded %s new episodes.", len(new_episodes))
         return new_episodes
     except Exception as e:
@@ -254,7 +264,7 @@ def store_transcript(hook: SqliteHook, link: str, transcript: str) -> None:
         target_fields=["link", "transcript"],
         replace=True
     )
-    
+
 @task()
 def speech_to_text() -> None:
     """
@@ -291,6 +301,11 @@ def podcast_summary():
     Returns:
         None
     """
+
+    # create the directory for the episodes
+    if not os.path.exists("episodes"):
+        os.makedirs("episodes")
+
     # create the database
     database = create_database()
 
