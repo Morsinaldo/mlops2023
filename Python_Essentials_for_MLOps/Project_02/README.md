@@ -2,185 +2,337 @@
 
 ## Introduction 
 
-Sem dados, modelos de aprendizado de máquina ficam impossibilitados de aprender sobre a tarefa na qual busca-se automatizar. Por isso, é de fundamental importância criar mecanismos que realizem a extração, processamento e armazenamento destes dados, processo conhecido como data pipeline. 
+Without data, machine learning models are unable to learn about the task they seek to automate. Therefore, it is of paramount importance to create mechanisms that perform data extraction, processing, and storage, a process known as a data pipeline.
 
-Uma das melhores ferramentas que auxliam nesse processo de criação e automatização de um data pipeline é o [Apache Airflow](https://airflow.apache.org/). Com isso em vista, este projeto visa o desenvolvimento de uma aplicação utilizando o Airflow para automatizar o processo de coleta de episódios de podcast, armazenamento de informações relevantes em um banco de dados SQlite, download dos episódios de áudio e transcrição dos episódios para texto. Essa automatização é configurada para ser executada diariamente. A imagem abaixo mostra um print dos passos que o código realizará retirado da plataforma do Airflow.
-
-## The code
-
-De forma geral, têm-se primeiramente a criação de uma DAG (Directed Acyclic Graph) nomeada "podcast_summary", a qual foi configurada para ser executada diariamente desde o dia 30 de Maio de 2022. Abaixo, o código mostra a criação da DAG e da tabela do banco que irá armazenar os dados dentro da função `podcast_summary()`, a qual é responsável por encapsular todas as etapas da DAG. O código completo pode ser encontrado em [podcast.py](./dags/podcast.py)
-
-```python
-# create a DAG
-@dag(
-    dag_id='podcast_summary',
-    schedule_interval="@daily",
-    start_date=pendulum.datetime(2022, 5, 30),
-    catchup=False,
-)
-def podcast_summary() -> None:
-    """This DAG extracts, processes, and stores podcast episodes.
-    
-    Returns:
-        None
-    """
-
-    # Create the database table
-    create_database: SqliteOperator = SqliteOperator(
-        task_id='create_table_sqlite',
-        sql=r"""
-        CREATE TABLE IF NOT EXISTS episodes (
-            link TEXT PRIMARY KEY,
-            title TEXT,
-            filename TEXT,
-            published TEXT,
-            description TEXT,
-            transcript TEXT
-        );
-        """,
-        sqlite_conn_id="podcasts"
-    )
-```
-
-De forma geral, ela contém uma série de passos que serão executados em sequência, definidos com o decorator `@task`. Então a primeira task definida foi a `get_episodes()`, a qual é responsável por realizar o download dos dados através de uma requisição GET na URL definida, transformar para o formato dicionário e retornar os episódios, os quais são então armazenados no banco de dados.
-
-```python
-def podcast_summary() -> None:
-
-    # rest of the code
-
-    @task()
-    def get_episodes() -> dict:
-        """
-        Fetches podcast episodes from the RSS feed.
-
-        Returns:
-            episodes (dict): A dictionary containing podcast episode information.
-        """
-        try:
-            # Download data
-            data = requests.get(PODCAST_URL)
-
-            # Raise an exception if the request is not succeed 
-            data.raise_for_status() 
-
-            # Transform to dict
-            feed = xmltodict.parse(data.text)
-
-            # Get episodes
-            episodes = feed["rss"]["channel"]["item"]
-            logging.info(f"Found {len(episodes)} episodes.")
-            return episodes
-        except Exception as e:
-            logging.error(f"Error fetching podcast episodes: {str(e)}")
-            raise
-
-    podcast_episodes: dict = get_episodes()
-    create_database.set_downstream(podcast_episodes)
-```
-
-A próxima task é definida como `load_episodes()` e ela recebe como entrada os dados dos episódios obtidos na etapa anterior. A partir disso, ela realiza a conexão com o banco de dados SQLite, recupera os episódios já armazenados no banco de dados, verifica se há novos episódios comparando os links dos episódios obtidos com os já armazenados e, por fim, insere os novos episódios no banco de dados.
-
-```python
-def podcast_summary() -> None:
-
-    # rest of the code
-
-    @task()
-    def load_episodes(episode_data: dict) -> list:
-        """
-        Loads new podcast episodes into the database.
-
-        Args:
-            episode_data (dict): A dictionary containing podcast episode information.
-
-        Returns:
-            new_episodes (list): A list of new episode records.
-        """
-        try:
-            # Connect to the database
-            hook = SqliteHook(sqlite_conn_id="podcasts")
-
-            # Get stored episodes
-            stored_episodes = hook.get_pandas_df("SELECT * from episodes;")
-            new_episodes = []
-
-            # Check for new episodes
-            for episode in episode_data:
-                if episode["link"] not in stored_episodes["link"].values:
-                    filename = f"{episode['link'].split('/')[-1]}.mp3"
-                    new_episodes.append([episode["link"], episode["title"], episode["pubDate"], episode["description"], filename])
-
-            # Insert new episodes into the database
-            hook.insert_rows(table='episodes', rows=new_episodes, target_fields=["link", "title", "published", "description", "filename"])
-            logging.info(f"Loaded {len(new_episodes)} new episodes.")
-            return new_episodes
-        except Exception as e:
-            logging.error(f"Error loading episodes into the database: {str(e)}")
-            raise
-
-    new_episodes: list = load_episodes(podcast_episodes)
-```
-
-O último passo da DAG é chamado de `transcribe_episodes()` e é responsável por realizar a conexão com o banco de dados, recuperar os episódios que ainda não foram transcritos, carregar um modelo de transcrição de fala Vosk, realizar a transcrição dos episódios de áudio para texto em chunks e, por fim, atualizar o banco de dados com as transcrições dos episódios.
+One of the best tools that aid in this process of creating and automating a data pipeline is [Apache Airflow](https://airflow.apache.org/). With this in mind, this project aims to develop an application using Airflow to automate the collection of podcast episodes, store relevant information in an SQLite database, download audio episodes, and transcribe episodes into text. This automation is configured to run daily.
 
 ## How to execute
 
-O primero passo é criar um ambiente virtual com no máximo a versão 3.10 do Python, pois o airflow ainda não oferece suporte para a 3.11. Neste caso, eu utilizei a versão 3.10 e você pode fazer isso utilizando o comando 
+If you are using Github Codespaces, you do not need to create a virtual environment. However, during the development of this project, we were unable to access the server ports. So, if you run it locally, it is highly recommended to create a virtual environment.
+
+Airflow does not yet support Python version 3.11. Therefore, to create a virtual environment, you can use the following command to create it with version 3.10.
+
 ```
 python3.10 -m venv airflow
 ```
 
-Para ativar o ambiente, execute o comando:
+To activate the environment, run the command:
 
 ```
 source ./airflow/bin/activate
 ```
 
-Para instalar as dependências necessárias, utilize o comando `pip`:
+To install Airflow, run the following commands:
+
+```
+AIRFLOW_VERSION=2.7.1
+PYTHON_VERSION="$(python --version | cut -d " " -f 2 | cut -d "." -f 1-2)"
+CONSTRAINT_URL="https://raw.githubusercontent.com/apache/airflow/constraints-${AIRFLOW_VERSION}/constraints-${PYTHON_VERSION}.txt"
+pip install "apache-airflow==${AIRFLOW_VERSION}" --constraint "${CONSTRAINT_URL}"
+```
+
+Once installed, you can run the application with the following command:
+
+```
+airflow standalone
+```
+
+This will create the configuration folder at `~/airflow` and will run it at `localhost:8080`. The next step is to change the file at `~/airflow/config.cfg` with the path to your DAGs. In my case, it looked like this:
+
+```
+dags_folder = /Users/morsinaldo/Desktop/mlops2023/Python_Essentials_for_MLOps/Project_02/dags
+load_examples = False
+```
+
+To install necessary dependencies, use `pip` command
 
 ```
 pip install -r requirements.txt
 ```
 
-Depois disso, precisamos realizar o download e a configuração do SQLite. Para isso, rode o comando abaixo ou realize o download diretamente do [site]()
-
-### Execution Example
-
-Vamos tomar o exemplo que você deseja procurar por recomendações de filmes parecidos com Super Mario.
+To install SQLite, let's run the following steps:
 
 ```
-python movie_recomendation.py --movie_title "Super Mario"
+wget https://www.sqlite.org/snapshot/sqlite-snapshot-202309111527.tar.gz
+tar -xzvf sqlite-snapshot-202309111527.tar.gz
+cd sqlite-snapshot-202309111527
+./configure
+make
+sudo make install
+sqlite3 --version
 ```
 
-O resultado no seu terminal deve ser algo semelhante a este resultado.
+At the path `your_path/mlops2023/Python_Essentials_for_MLOps/Project_02/dags`, create a database in a new terminal session:
 
-# Incluir imagem da execução
+```
+sqlite3 episodes.db
+.databases
+.quit
+```
 
-## How to add more movies
+Create a connection to the database
 
-A cada dia, são lançados novos filmes e, com isso, é desejável manter a nossa base de dados atualizada não é? Então, se você deseja fazer isso sem compromenter a exeução correta do código, eu criei alguns testes que irão amenizar a chance de ocorrer algum problema durante a execução. 
+```
+airflow connections add 'podcasts' --conn-type 'sqlite' --conn-host 'your_path/mlops2023/Python_Essentials_for_MLOps/Project_02/dags/episodes.db'
+```
 
-No arquivo [conftest.py](./conftest.py), você irá encontrar uma fixture que irá carregar os datasets em memória para poderem ser utilizados nos testes. Já no arquivo [test_data.py](./test/test_data.py), você irá encontrar testes que verificam, por exemplo, se o tipo de cada coluna está de acordo com o esperado, se há um número mínimo de linhas desejável, se os datasets possuem as colunas com os respectivos nomes esperados, entre outros. Sinta-se livre para adicionar mais testes na sua aplicação, eles são muito importantes e podem economizar muito tempo de depuração dos erros.
+Check to make sure there are data (optional)
 
-Para executar os testes, basta você rodar o comando abaixo:
+```
+airflow connections get podcasts
+```
+
+Now, just run `airflow standalone` again to load the changes made. If you click on the `podcast_summary` DAG graph, you will find a graph similar to the one in the image below.
+
+![alt text](./images/execution.png)
+
+## The code
+
+In general, we first have the creation of a DAG (Directed Acyclic Graph) named 'podcast_summary', which was configured to run daily starting from May 30, 2022. Below, the code shows the creation of the DAG and the definition of the `podcast_summary()`` function, which contains the execution of the `tasks`. The complete code can be found in [podcast.py](./dags/podcast.py).
+
+```python
+# create a DAG
+@dag(
+    dag_id='podcast_summary',
+    schedule="@daily",
+    start_date=pendulum.datetime(2023, 9, 29),
+    catchup=False,
+)
+
+def podcast_summary():
+    """
+    Definition of the DAG.
+
+    Returns:
+        None
+    """
+
+    # create the directory for the episodes
+    if not os.path.exists("episodes"):
+        os.makedirs("episodes")
+
+    # create the database
+    database = create_database()
+
+    # fetch episodes
+    podcast_episodes = get_episodes()
+
+    # set downstream dependencies
+    database.set_downstream(podcast_episodes)
+
+    # load episodes
+    load_episodes(podcast_episodes)
+
+    # download episodes
+    download_episodes(podcast_episodes)
+
+    # transcribe episodes
+    # speech_to_text()
+```
+
+The first defined task was `get_episodes()`, which is responsible for downloading data through a GET request to the defined URL, transforming it into dictionary format, and returning the episodes, which are then stored in the database. To facilitate unit testing, each task returns a function call. In this way, tests were performed on the functions that the tasks execute.
+
+```python
+def fetch_data() -> list:
+    """
+    Downloads podcast episodes as audio files.
+
+    Returns:
+        audio_files (list): A list of dictionaries containing audio file information.
+    """
+    try:
+        # download data
+        data = requests.get(PODCAST_URL, timeout=15)
+
+        # transform to dict
+        feed = xmltodict.parse(data.text)
+
+        # get episodes
+        episodes = feed["rss"]["channel"]["item"]
+        logging.info("Found %s episodes.", len(episodes))
+        return episodes
+    except requests.RequestException as e:
+        logging.error("Error fetching podcast episodes: %s", str(e))
+        raise
+    except Exception as general_error:
+        logging.error("Error parsing podcast episodes: %s", str(general_error))
+        raise
+
+
+@task()
+def get_episodes() -> list:
+    """
+    Task to fetch podcast episodes from the RSS feed.
+
+    Returns:
+        episodes (list): A list of dictionaries containing podcast episode information.
+    """
+    return fetch_data()
+```
+
+The next task is defined as `load_episodes()`, and it takes the data of the episodes obtained in the previous step as input. From this, it establishes a connection with the SQLite database, retrieves the episodes already stored in the database, checks for new episodes by comparing the links of the obtained episodes with those already stored, and finally inserts the new episodes into the database.
+
+```python
+def load_data(episodes: list) -> list:
+    """
+    Loads new podcast episodes into the database.
+
+    Args:
+        episodes (list): A list of dictionaries containing podcast episode information.
+
+    Returns:
+        new_episodes (list): A list of new episode records.
+    """
+    try:
+        # connect to the database
+        hook = SqliteHook(sqlite_conn_id="podcasts")
+
+        # get stored episodes
+        stored_episodes = hook.get_pandas_df("SELECT * from episodes;")
+        new_episodes = []
+
+        # check for new episodes
+        for episode in episodes:
+            if episode["link"] not in stored_episodes["link"].values:
+                filename = f"{episode['link'].split('/')[-1]}.mp3"
+                new_episodes.append([episode["link"],
+                                     episode["title"],
+                                     episode["pubDate"],
+                                     episode["description"],
+                                     filename])
+
+        # insert new episodes into the database
+        hook.insert_rows(table='episodes',
+                         rows=new_episodes,
+                         target_fields=["link",
+                                        "title",
+                                        "published",
+                                        "description",
+                                        "filename"])
+        logging.info("Loaded %s new episodes.", len(new_episodes))
+        return new_episodes
+    except Exception as e:
+        logging.error("Error loading episodes into the database: %s", str(e))
+        raise
+
+@task()
+def load_episodes(episode_data: list) -> list:
+    """
+    Task to load new podcast episodes into the database.
+
+    Args:
+        episode_data (list): A list of dictionaries containing podcast episode information.
+
+    Returns:
+        new_episodes (list): A list of new episode records.
+    """
+    return load_data(episode_data)
+```
+
+The other task is defined as `download_episodes()`, which receives the list of episodes from the first task and is responsible for downloading the episodes and storing them in the `episodes` folder.
+
+```python
+def download_data(episodes: list) -> list:
+    """
+    Download the specified podcast episodes.
+
+    Args:
+        episodes (list): A list of dictionaries containing podcast episode information.
+
+    Returns:
+        audio_files (list): A list of dictionaries containing audio file information.
+    """
+
+    audio_files = []
+
+    for episode in episodes:
+        try:
+            name_end = episode["link"].split('/')[-1]
+            filename = f"{name_end}.mp3"
+            audio_path = os.path.join(EPISODE_FOLDER, filename)
+            if not os.path.exists(audio_path):
+                logging.info("Downloading episode %s", episode["link"])
+                audio = requests.get(episode["enclosure"]["@url"], timeout=15)
+                with open(audio_path, "wb+") as file:
+                    file.write(audio.content)
+            audio_files.append({
+                "link": episode["link"],
+                "filename": filename
+            })
+        except requests.RequestException as e:
+            logging.error("Error downloading podcast episode: %s", str(e))
+            raise
+        except IOError as e:
+            logging.error("Error writing podcast episode to disk: %s", str(e))
+            raise
+        except Exception as general_error:
+            logging.error("Error downloading podcast episode: %s", str(general_error))
+            raise
+
+    return audio_files
+
+@task()
+def download_episodes(episode_data: list) -> list:
+    """
+    Task to download the specified podcast episodes.
+
+    Args:
+        episode_data (list): A list of dictionaries containing podcast episode information.
+
+    Returns:
+        audio_files (list): A list of dictionaries containing audio file information.
+    """
+    return download_data(episode_data)
+```
+
+The final step of the DAG is called `transcribe_episodes()` and is responsible for connecting to the database, retrieving episodes that have not yet been transcribed, loading a Vosk speech transcription model, performing audio-to-text transcription of the episodes in chunks, and finally updating the database with the transcriptions of the episodes. Just like in the original example, this function was not used in the script execution.
+
+## Pytest
+
+To ensure that all components and tasks are working correctly, some didactic tests were created to check the result of certain steps.
+
+In this sense, the file [conftest.py](./conftest.py) contains the fixture for the overall DAG and the episode download. In the file [test_dag.py](./test_dag.py), you will find tests that verify, for example, if the database instance is correct, if episode downloads are happening correctly, and if the audio transcription task model is correct. Feel free to add more tests to your application; they are very important and can save a lot of debugging time.
+
+To run the tests, simply execute the command below:
 
 ```
 pytest
 ```
 
-# Incluir imagem da execução do pytest
+To run a specific test file, you can pass the file name, for example:
+
+```
+pytest test_dag.py
+```
+
+The result of executing this command can be seen in the image below:
+
+![alt text](./images/pytest.png)
 
 ## Code style
 
-Note que eu tentei deixar o nome das variáveis da forma mais legível possível, bem como os nomes dos testes. Isso deixa o código mais limpo e mais legível, melhorando assim a sua legibilidade. Em relação ao AutoPep8, eu consegui uma nota X/10. Não fique tão obcecado em alcançar a nota 10. É preciso ter bom censo e ser crítico em relação à algumas coisas como a quantidade de espaços na identação, pois dependendo da resolução da tela que você está olhando, dois espaços podem ser mais interessantes do que quatro. 
+Please note that I tried to make variable names as readable as possible, as well as test names. In addition to the docstring, the code became cleaner and more readable, thus improving its overall readability. Regarding Pylint, I achieved a score of 10/10. However, don't become overly obsessed with reaching the maximum score. It's essential to use good judgment and be critical about certain things, such as the number of spaces in indentation, as it may vary depending on the screen resolution you are working with; sometimes two spaces might be more appropriate than four.
 
-Para executar o AutoPep8, basta você rodar o seguinte comando:
+To run Pylint, you can simply execute the following command:
 
 ```
-Colocar o comando do AutoPep8
+pylint filename
 ```
+
+Below are some examples of execution and their results:
+
+- ```pylint movie_recomendation.py```
+
+![alt text](./images/pylint_01.png)
+
+- ```pylint conftest.py```
+
+![alt text](./images/pylint_02.png)
+
+- ```pylint utils.py```
+
+![alt text](./images/pylint_03.png)
 
 ## Copyrights
 
-Este projeto foi adaptado de um `Portfolio Project` do site [Dataquest](https://www.dataquest.io/). Em relação à [solução original](https://github.com/dataquestio/project-walkthroughs/blob/master/movie_recs/movie_recommendations.ipynb), foi realizada a adaptação de um Jupyter notebook com um sistema de recomendação interativo para scripts em python com o intuito de facilitar e viabilizar a utilização do Pylint, do AutoPep8 e da passagem de argumentos através da linha de comando.
+This project was adapted from a `Portfolio Project` on the [Dataquest](https://www.dataquest.io/) website. In relation to the [original solution](https://github.com/dataquestio/project-walkthroughs/blob/master/podcast_summary/podcast_summary.py), adaptations were made to external functions to facilitate the execution of unit tests.

@@ -9,32 +9,32 @@ In this project, we will use the [Kaggle dataset](https://www.kaggle.com/dataset
 
 ## How to execute
 
-Uma vez que você já tenha criado o ambiente virtual de sua preferência e instalado as dependências, basta você ativá-lo e executar o comando abaixo.
+Once you have created your preferred virtual environment and installed the dependencies, you can simply activate it and execute the following command:
 
 ```
 python main.py
 ```
 
-Para permitir uma maior flexibilidade da utilzação do script através da linha de comando, ele permite a passagem de dois parâmetros:
+To allow greater flexibility in script usage via the command line, it enables the passing of two parameters:
 
-- test_size: permite que o usuário defina a proporção que será utilizada para o conjunto de teste durante o treinamento. Aceita valores do tipo float entre 0 e 1. Default: 0.2
-- hyperparameter_tuning: permite que o usuário defina se deseja realizar a busca bayesiana pelo melhores hyperparâmetros do modelo. Aceita valores True or False. Default: False
+- test_size: allows the user to define the proportion used for the test set during training. Accepts float values between 0 and 1. Default: 0.2
+- hyperparameter_tuning: allows the user to specify whether they want to perform a Bayesian search for the best model hyperparameters. Accepts values True or False. Default: False
 
 ### Execution Example
 
-Supondo que você deseja uma proporção de 15% para teste e deseja realizar o hyperaparameter tuning
+Assuming you want a 15% test proportion and wish to perform hyperparameter tuning:
 
 ```
 python main.py --test_size 0.15 --hyperparameter_tuning True
 ```
 
-O print do final da saída do código deve ser parecida com essa:
+The final output print of the code should look something like this:
 
 ![alt text](./images/execution.png)
 
 ## The code
 
-No arquivo [main.py](./main.py), foi utilizada a arquitetura `try - except` para realizar a leitura do dataset, a análise exploratória dos dados (EDA) e a limpeza das features. As funcões auxiliares utilizadas no script encontram-se no arquivo [utils.py](./utils.py) e o código mencionado encontra-se abaixo.
+In the file [main.py](./main.py), the `try - except` architecture was used to perform dataset reading, exploratory data analysis (EDA), and feature cleaning. The auxiliary functions used in the script can be found in the file [utils.py](./utils.py), and the mentioned code is as follows.
 
 ```python
 # read the data
@@ -63,7 +63,8 @@ except Exception as e:
     logging.error(e)
 ```
 
-Um vez que o conjunto de dados encontra-se limpo, foi realizada a seleção de features e a plotagem de um mapa de calor com a correlação das colunas. Com isso, foi realizada a divisão entre treinamento e teste numa proporção padrão de 80% para treinamento e 20% para teste, mas o usuário pode definir um valor diferente através do parâmetro `test_size` durante a execução do script na linha de comando. O código abaixo mostra a execução dos comandos mencionados.
+
+Once the dataset is clean, feature selection was performed, and a heatmap was plotted to display the column correlations. Subsequently, the data was split into training and testing sets, with a default ratio of 80% for training and 20% for testing. However, the user can define a different value using the `test_size` parameter when running the script from the command line. The code below demonstrates the execution of the mentioned commands.
 
 ```python
 # Feature selection
@@ -87,7 +88,7 @@ logging.info("The shape of the training data is %s", X_train.shape)
 logging.info("The shape of the test data is %s", X_test.shape)
 ```
 
-A seguir, instancia-se um objeto MinMaxSaler para realizar deixar os valores das colunas escalonados e realiza-se o treinamento de fato do modelo KNeighborsClassifier. Com o modelo treinado, realiza-se as predições a avaliação do modelo por meio da métrica de acurácia. Tal código está mostrado abaixo.
+Next, an instance of the MinMaxScaler object is created to scale the column values, and the actual training of the KNeighborsClassifier model is performed. With the trained model, predictions are made, and the model is evaluated using the accuracy metric. The code for this is shown below.
 
 ```python
 # scale the data
@@ -111,7 +112,7 @@ accuracy = accuracy_score(y_test, y_pred)
 logging.info("The accuracy of the model is %s", accuracy)
 ```
 
-Caso o usuário deseje, ele pode ainda realizar um hyperparameter tuning do modelo através de uma busca Bayesiana de parâmetros. Por padrão, essa opção está definida como Falsa, mas o usuário pode ativá-la definindo o parâmetro `hyperparameter_tuning` igual a True na execução do script através da linha de comando. o código que realiza esse procedimento está mostrado abaixo:
+If the user desires, they can also perform hyperparameter tuning of the model through a Bayesian parameter search. By default, this option is set to False, but the user can activate it by setting the `hyperparameter_tuning` parameter to True when executing the script via the command line. The code that performs this procedure is shown below.
 
 ```python
 if args.hyperparameter_tuning == True:
@@ -144,30 +145,30 @@ if args.hyperparameter_tuning == True:
 
 ## How to add more data (Pytest)
 
-A cada dia novos dados são gerados e, com isso, é desejável manter a nossa base de dados atualizada não é? Então, se você deseja fazer isso sem compromenter a exeução correta do código, eu criei alguns testes que irão amenizar a chance de ocorrer algum problema durante a execução. 
+Every day, new data is generated, and as a result, it is desirable to keep our database up to date, isn't it? So, if you wish to do this without compromising the correct execution of the code, I have created some tests that will reduce the chance of any problems occurring during execution.
 
-No arquivo [conftest.py](./conftest.py), você irá encontrar uma fixture que irá carregar o dataset em memória para poder ser utilizado nos testes. Já no arquivo [test_data.py](./test/test_data.py), você irá encontrar testes que verificam, por exemplo, se o tipo de cada coluna está de acordo com o esperado, se todas estão presentes, se as colunas categóricas possuem os valores esperados, se as colunas numéricas estão com valores dentro de um certo intervalo entre outros. Sinta-se livre para adicionar mais testes na sua aplicação, eles são muito importantes e podem economizar muito tempo de depuração dos erros.
+In the file [conftest.py](./conftest.py), you will find a fixture that loads the dataset into memory to be used in the tests. In the file [test_data.py](./test/test_data.py), you will find tests that check, for example, if the data types of each column are as expected, if all columns are present, if categorical columns have the expected values, if numeric columns have values within a certain range, and more. Feel free to add more tests to your application; they are very important and can save a lot of debugging time.
 
-Para executar os testes, basta você rodar o comando abaixo:
+To run the tests, simply execute the command below:
 
 ```
 pytest
 ```
 
-Para executar algum arquivo de teste específico, você pode passar o nome do arquivo, por exemplo:
+To run a specific test file, you can pass the file name, for example:
 
 ```
 pytest test/test_data.py
 ```
 
-O resultado da execução deste comando pode ser visualizado na imagem abaixo:
+The result of executing this command can be seen in the image below:
 
 ![alt text](./images/pytest.png)
 
 
 ## Clean codes Principles
 
-Note que, em relação a [solução original](https://github.com/dataquestio/solutions/blob/master/Mission740Solutions.ipynb), vários nomes de variáveis e de funções foram alterados de forma a deixar o código mais legível, além da modularização de alguns passos do pipeline e da adição do tratamento de exceções e da adição de loggings. Além disso, realizou-se a documentação das funções e, formato docstring e utilizando a dica de tipo, como mostra o exemplo da função abaixo:
+Note that, compared to the [original solution](https://github.com/dataquestio/solutions/blob/master/Mission740Solutions.ipynb), several variable and function names have been changed to make the code more readable. Additionally, some steps of the pipeline have been modularized, exception handling has been added, and logging has been incorporated. Furthermore, function documentation has been provided, in docstring format, and using type hints, as demonstrated in the example function below:
 
 ```python
 def clean_data(df: pd.DataFrame) -> pd.DataFrame:
@@ -204,15 +205,15 @@ def clean_data(df: pd.DataFrame) -> pd.DataFrame:
     return df_clean
 ```
 
-Note que eu tentei deixar o nome das variáveis da forma mais legível possível, bem como os nomes dos testes. Em adição à docstring, o código ficou mais limpo e mais legível, melhorando assim a sua legibilidade. Em relação ao Pylint, eu consegui uma nota 10/10. Não fique tão obcecado em alcançar a nota máxima. É preciso ter bom censo e ser crítico em relação à algumas coisas como a quantidade de espaços na identação, pois dependendo da resolução da tela que você está olhando, dois espaços podem ser mais interessantes do que quatro. 
+Please note that I have tried to make variable names as readable as possible, as well as test names. In addition to the docstring, the code has become cleaner and more readable, thus improving its overall readability. Regarding Pylint, I achieved a score of 10/10. However, don't become overly obsessed with reaching the maximum score. It's essential to use good judgment and be critical about certain things, such as the number of spaces in indentation, as it may vary depending on the screen resolution you are working with; sometimes two spaces might be more appropriate than four.
 
-Para executar o Pylint, basta você rodar o seguinte comando:
+To run Pylint, you can simply execute the following command:
 
 ```
 pylint filename
 ```
 
-Abaixo encontram-se alguns exemplos de execução e os seus resultados:
+Below are some execution examples and their results:
 
 - ```pylint movie_recomendation.py```
 
@@ -228,4 +229,4 @@ Abaixo encontram-se alguns exemplos de execução e os seus resultados:
 
 ## Copyrights
 
-Este projeto foi adaptado de um `Guided Project` do site [Dataquest](https://www.dataquest.io/), em particular, do caminho [Machine Learning in Python](https://app.dataquest.io/learning-path/machine-learning-in-python-skill). Em relação à [solução original](https://github.com/dataquestio/project-walkthroughs/blob/master/movie_recs/movie_recommendations.ipynb), foi realizada a adaptação de um Jupyter notebook para scripts em python com o intuito de facilitar e viabilizar a utilização do Pylint, do AutoPep8 e da passagem de argumentos através da linha de comando.
+This project was adapted from a `Guided Project`` on the [Dataquest](https://www.dataquest.io/) website, specifically from the [Machine Learning in Python](https://app.dataquest.io/learning-path/machine-learning-in-python-skill) learning path. Compared to the [original solution](https://github.com/dataquestio/project-walkthroughs/blob/master/movie_recs/movie_recommendations.ipynb), it involved transforming a Jupyter notebook into Python scripts to facilitate and enable the use of Pylint, AutoPep8, and command-line argument passing.

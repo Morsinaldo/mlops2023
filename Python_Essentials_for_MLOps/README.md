@@ -1,15 +1,15 @@
 # Python Essentials for MLOps
 
-Antes de iniciar no fabuloso mundo das operações de Machine Learning (MLOps), existem um conjunto de boas práticas a serem seguidas que facilitam a legibilidade e a manutenção do código. Afinal, em um projeto real com um modelo em produção, caso um erro aconteça, outros desenvolvedores irão ler o seu código para poder identificar o problema. Uma identação padronizada e loggings são muito úteis neste ponto. Ou ainda, se você precisa retreinar o modelo e a base de dados precisa ser tratada, verificar se não há nenhuma coluna inválida, se o número de instâncis é suficiente, entre outros. Nesse sentido, testes unitários podem facilitar bastante este processo. 
+Before delving into the fabulous world of Machine Learning Operations (MLOps), there are a set of best practices to follow that enhance code readability and maintainability. After all, in a real project with a model in production, if an error occurs, other developers will read your code to identify the problem. Standardized indentation and logging are very useful in this regard. Additionally, if you need to retrain the model and the database needs to be processed, you should check for invalid columns, ensure an adequate number of instances, and more. In this context, unit tests can greatly simplify this process.
 
 ![alt text](./images/header.png)
 
-Com isso em vista, foram desenvolvidos três projetos com o intuito de explorar algumas dessas melhores práticas, as quais serão explicadas em mais detalhes abaixo. Você também pode conferir [meu vídeo]() explicando de forma geral o funcionamento de cada projeto.
+With this in mind, three projects have been developed to explore some of these best practices, which will be explained in more detail below. You can also check out [my video]() explaining the overall functionality of each project.
 
 ## Projetos Desenvolvidos
-   - [Movie System Recomendation](./Project_01/): Neste projeto, foi desenvolvido um sistema de recomendação de filmes no qual o usuário fornece um título e o algoritmo irá realizar uma busca pelos nomes de filmes mais parecidos na sua base de dados e com isso, realizar uma recomendação de filmes baseada nas opniões de outros usuários com gostos semelhnates.
-   - [Airflow Data Pipeline to Download Podcasts](./Project_02/): Neste projeto, foi desenvolvido um pipeline baseado em grafos utilizando o airflow para a extração automática de arquivos de podcasts.
-   - [Predicting Heart Disease](./Project_03/): Neste projeto, foi desenvolvido um scritp para automatizar o treinamento de um modelo capaz de prever doenças cardíacas com base nos dados clínicos de um paciente. O usuário pode ainda definir se deseja realizar a busca pelos melhores hiperparâmetros e pode definir a porcentagem da base que será utilizada para teste.
+   - [Movie System Recomendation](./Project_01/): In this project, a movie recommendation system was developed, where the user provides a title, and the algorithm searches for the most similar movie titles in its database, providing movie recommendations based on the preferences of other users with similar consumption patterns.
+   - [Airflow Data Pipeline to Download Podcasts](./Project_02/): In this project, a graph-based pipeline using Apache Airflow was developed for the automatic extraction of podcast files. This ensures that the data is already extracted, processed, and stored for consumption by a machine learning model, for example.
+   - [Predicting Heart Disease](./Project_03/): In this project, a script was developed to automate the training of a model capable of predicting heart diseases based on a patient's clinical data. The user can also choose whether to perform hyperparameter tuning and define the percentage of the dataset to be used for testing.
 
 ## Requirements/Tecnologies
 
@@ -26,7 +26,7 @@ Com isso em vista, foram desenvolvidos três projetos com o intuito de explorar 
    - xmltodict
    - python-dotenv
 
-   Você pode encontrar a lista completa com as respectis versões no arquivo [requirements.txt](./requirements.txt)
+   You can find the complete list with the respective versions in the [requirements.txt](./requirements.txt) file.
 
 ## Instalation Instructions
 
@@ -74,24 +74,33 @@ Hoje em dia, utiliza-se muito cloud computing para hospedar aplicações e isso 
 
 Para tratar isso, existem alguns gerenciadores de pacotes que facilitam o tratamento desses conflitos. Como sugestão, eu apresento o [Anaconda](https://anaconda.org), o [Poetry](https://python-poetry.org) e o [Python Venv](https://docs.python.org/3/library/venv.html).
 
+
+These days, cloud computing is widely used to host applications, and it comes with associated costs. Therefore, the fewer dependencies an application has, the better. In this regard, creating a virtual environment simulates a "sandbox" that contains the dependencies needed for the application to run correctly. Moreover, creating this environment prevents a specific library from one project from conflicting with a library from another project, for example.
+
+To address this, there are package managers that make handling these conflicts easier. As a suggestion, I present [Anaconda](https://anaconda.org), [Poetry](https://python-poetry.org), and [Python Venv](https://docs.python.org/3/library/venv.html).
+
 ### Command Line Interface
 
-A Interface de Linha de Comando (CLI) é o meio pelo qual nós executamos os scripts que estamos desenvolvendo e uma das possibilidades que esse meio abre é a passagem de parâmetros para a execução. Por exemplo, você pode colocar um parâmetro que define quais passos do seus pipeline o script vai executar, qual a proporção da divisão entre treinamento e teste ou até mesmo hiperparâmetros para o treinamento. O limite é a sua imaginação. :D
+The Command Line Interface (CLI) is the means by which we run the scripts we are developing, and one of the possibilities that this medium offers is the ability to pass parameters for execution. For example, you can include a parameter that defines which steps of your pipeline the script will execute, the proportion of the split between training and testing, or even hyperparameters for training. The limit is your imagination. 😃
 
-Em geral, quando estamos aprendendo machine learning, tendemos a aprender utilizando Jupyter Notebooks. Eles são bastante interessantes quando estamos fazendo experimentações e, apesar de algumas plataformas como Amazon SageMaker permitirem o deploy de aplicações utilizando Jupyter Notebooks, isso não é tão comum e nem é tão eficiente. Portanto, uma boa prática é desenvolver scripts que possam ser executados por meio do CLI.
+In general, when we are learning machine learning, we tend to use Jupyter Notebooks. They are quite useful when conducting experiments. However, despite platforms like Amazon SageMaker allowing the deployment of applications using Jupyter Notebooks, this is not very common or efficient. Therefore, a good practice is to develop scripts that can be executed via the CLI.
 
-Leitura recomendada: Data Science at the Command Line - Jeroen Jansses [1]
+Recommended reading: Data Science at the Command Line - Jeroen Jansses 
 
 ### Clean Code Principles
 
-Uma vez que concordamos em escrever scripts, qual a melhor maneira de fazer isso? Não é apenas sair escrevendo o código como se não houvesse amanhã. Existem algumas boas práticas que podem ser seguidas para escrever códigos mais limpos, como por exemplo as apresentadas nos livros Clean Code in Python e Fluent Python:
+Once we agree to write scripts, what's the best way to do it? It's not just about writing code as if there were no tomorrow. There are some best practices that can be followed to write cleaner code, as presented in books like "Clean Code in Python" and "Fluent Python":
 
-1. Writing clean codes: utilizar *meaningful names* evitando abreviações e single letters. Além disso, pode-se ainda indicar o tipo da variável e utilizar nomes que descrevam da forma mais breve possível o significado daquela variável, função etc. Remember that long names are not the same as descriptive names.
-2. Writing modular codes: Don't repeat yourself (DRY). Abstract out logic to improve readability. Function do one thing. Um código modularizado também facilita os testes unitários.
-3. Refactoring: Sometimes you can modularize more your code or even reduce the execution time of your code improving internal structure without changing external functionality. For example, if you have a nested loop for and you can reduce the complexity using list comprehenssion or dictionaries.
-4. Efficient code and documentation: Knowing how to write code that runs efficiently is another essential skill in software development. Note that one point is related to the other. The example above also applies to this one. When you're performing lots of different transformations on large amounts of data, this can make orders of magnitudes of difference in performance.
-5. Documentation: É fundamental para quem está lendo o seu código, pois como uma pessoa que nunca viu o seu código vai poder olhar e entender de forma simples o que você fez? Comentários concisos de uma linha podem ser muito úteis para explicar o que aquele comando faz e docstrings para funções e classes utilizando a anotação dos tipos dos dados agilizam muito o entendimento de qual o objetivo daquela entidade.
-6. Following PEPs: Python Enhancement Proposals (PEP) é um conjunto de diretrizes e recomendações para escrever código Python de maneira mais clara, legível e consistente. Ele define um estilo de codificação que ajuda os desenvolvedores a produzirem um código mais organizado e de fácil compreensão. Destacam-se:
+1. **Writing clean code**: Use *meaningful names*, avoid abbreviations and single letters. Additionally, you can indicate the variable type and use names that describe the meaning of that variable, function, etc., as concisely as possible. Remember that long names are not the same as descriptive names.
+
+2. **Writing modular code**: Don't repeat yourself (DRY). Abstract out logic to improve readability. Functions should do one thing. Modularized code also facilitates unit testing.
+
+3. **Refactoring**: Sometimes, you can modularize your code further or even reduce execution time by improving the internal structure without changing external functionality. For example, if you have a nested loop, you can reduce complexity using list comprehensions or dictionaries.
+
+4. **Efficient code and documentation**: Knowing how to write code that runs efficiently is another essential skill in software development. Note that one point is related to the other. The example above also applies to this one. When you're performing lots of different transformations on large amounts of data, this can make orders of magnitude of difference in performance.
+
+5. **Documentation**: It's fundamental for someone reading your code. How can someone who has never seen your code before look at it and understand what you did in a simple way? Concise one-line comments can be very useful to explain what a command does, and docstrings for functions and classes using data type annotations greatly facilitate understanding the purpose of that entity.
+6. Following PEPs: Python Enhancement Proposals (PEP) is a set of guidelines and recommendations for writing Python code in a clearer, more readable, and consistent manner. It defines a coding style that helps developers produce more organized and easily understandable code. Some notable PEPs include:
 
    - [PEP 8 – Style Guide for Python Code](https://peps.python.org/pep-0008/)
    - [PEP 3107 – Function Annotations](https://peps.python.org/pep-3107/)
@@ -100,40 +109,37 @@ Uma vez que concordamos em escrever scripts, qual a melhor maneira de fazer isso
    - [PEP 0557 – Data Classes](https://peps.python.org/pep-0557/)
    - [PEP 0585 – Type Hinting Generics In Standard Collections](https://peps.python.org/pep-0585/)
 
-Legal! Isso vai ajudar muito outras pessoas, mas como eu posso tornar esse processo mais rápido? Felizmente, já existem algumas bibliotecas que checam o nosso código em busca de inconformidades com a norma e informa o que não está de acordo. Esse processo é chamado de Linting 
+Great! This will help many other people, but how can I make this process faster? Fortunately, there are already some libraries that check our code for non-compliance with the standards and inform what is not in accordance. This process is called Linting.
 
 ### Linting
 
-Nesse sentido, existem várias ferramentas que podem nos auxiliar na escrita de códigos padronizados. A primeira delas é [autopep8](https://pypi.org/project/autopep8/) e, de forma geral, ela automatiza a formatação do nosso código para o padrão do PEP8, realizando as mudanças diretamente no arquivo. Já o [pylint]() é uma biblioteca que analisa e gera uma nota de 0 a 10 para o nosso código e informa o que não está de acordo com a norma para o próprio usuário realize as modificações. O [pycodestyle](https://pypi.org/project/pycodestyle/) é bem similar ao pylint com a diferença de que ele não gera uma nota, apenas indica as modificações. As ferramentas de linting serão mostradas em mais detalhes no contexto de cada projeto.
-
+In this regard, there are several tools that can assist us in writing standardized code. The first of these is [autopep8](https://pypi.org/project/autopep8/), which generally automates the formatting of our code to the PEP8 standard, making changes directly to the file. [Pylint](https://www.pylint.org/) is a library that analyzes and generates a score from 0 to 10 for our code, informing the user of non-compliance with the standard, and allowing the user to make the necessary modifications. [pycodestyle](https://pypi.org/project/pycodestyle/) is quite similar to pylint, with the difference that it doesn't generate a score; it simply indicates the modifications needed. The linting tools will be shown in more detail in the context of each project.
 ### Tratamento de Erros
 
-Este ponto é muito importante, pois no cenário de produção muito erros podem acontecer e nós devemos estar aptos e mitigar isso o mais rápido possível. Por exemplo, alguns erros que podem acontecer são:
+This point is very important because in a production scenario, many errors can occur, and we must be prepared to mitigate them as quickly as possible. For example, some errors that can occur are:
 
-   - Data Loading Failure: Imagine um modelo que é retreinado todos os dias com os novos injetados do dia anterior. Um belo dia, a fonte do dado muda sem aviso prévio e o pipeline não consegue lidar com essa mudança de forma adequada. Como resultado, o modelo não é treinado naquele dia, impactando em várias outras dowstream applications.
-   - API Rate Limiting: Suponha que seu pipeline realiza o download dos dados de uma API externa. Caso a API impuser uma limitação de taxa e seu sistema não tratar essa exceção, o pipeline pode falhar ou ficar preso em um loop infinito, causando uma série de falhas downstream.
-   - Resource Exhaustion: Imagine um modelo de aprendizado de máquina que realiza recomendação de produtos em um site de comércio eletrônico. Se o modelo apresentar um erro que não foi tratado adequadamente em um horário de pico de vendas, isso resultará em uma perda significativa de receita.
-   - Timeout Errors: Poor handling of timeout errors can cascade, causing a failure in multiple dependent systems. Quanto mais completo o pipeline, maior o prejuízo que poderá ser causado.
+   - Data Loading Failure: Imagine a model that is retrained every day with new data from the previous day. One day, the data source changes without notice, and the pipeline cannot handle this change properly. As a result, the model is not trained that day, impacting various downstream applications.
+   - API Rate Limiting: Suppose your pipeline downloads data from an external API. If the API imposes a rate limit and your system does not handle this exception, the pipeline may fail or get stuck in an infinite loop, causing a series of downstream failures.
+   - Resource Exhaustion: Imagine a machine learning model that provides product recommendations on an e-commerce website. If the model encounters an error that is not handled properly during a peak sales period, it will result in a significant loss of revenue.
+   - Timeout Errors: Poor handling of timeout errors can cascade, causing a failure in multiple dependent systems. The more comprehensive the pipeline, the greater the potential damage.
 
-Em face disso, o python fornece uma [documentação](https://docs.python.org/3/tutorial/errors.html) sobre este ponto, tanto os tratamentos mais padrões quanto tratamentos customizados.
-
-
+In light of this, Python provides [documentation](https://docs.python.org/3/tutorial/errors.html) on this topic, covering both standard error handling and custom error handling.
 ### Pytest
 
-Com o código padronizado, documentado e funcionando para o meu caso de uso, estamos prontos para colocar em produção? Calma, o seu código pode estar funcionando perfeitamente para o seu caso de uso, mas e se acontecerem os edge cases, como o seu código vai se comportar? An edge case is a problem or situation that occurs only at an extreme (maximum or minimum) operating parameter.
+With standardized, documented, and working code for your use case, are you ready to put it into production? Hold on, your code may be working perfectly for your use case, but what if edge cases occur? How will your code behave? An edge case is a problem or situation that occurs only at an extreme (maximum or minimum) operating parameter.
 
-Uma ótima forma de tratar isso é com testes, em particupar o python possui uma ferramenta chamada [Pytest](https://docs.pytest.org/en/7.4.x/) que oferece várias features para facilitar esse processo. Uma delas é a Fixture, a qual permite instanciar um objeto de um dataset ou de um modelo, por exemplo, e utilizá-lo em vários testes, sem precisar instanciá-lo em cada um.
+A great way to handle this is through testing, and Python, in particular, has a tool called [Pytest](https://docs.pytest.org/en/7.4.x/) that offers various features to facilitate this process. One of them is the Fixture, which allows you to instantiate an object from a dataset or a model, for example, and use it in multiple tests without having to instantiate it in each one.
 
-Essa prática faz com que você "gaste" um pouco mais de tempo pensando nos erros que podem acontecer, mas também faz com que você economize muito mais tempo no futuro procurando pelo o erro no seu código. Claro que é humanamente impossível pensar em todos os casos que podem acontecer, mas você pode começar se perguntando, por exemplo: 
+This practice requires you to spend a little more time thinking about the errors that can occur, but it also saves you much more time in the future when looking for errors in your code. Of course, it's humanly impossible to think of all the cases that can happen, but you can start by asking yourself, for example:
 
-- "Se minha aplicação está esperando receber um arquivo csv, o que acontece se ela receber um xlsx ou parquet?" 
-- "Se minha função está esperando receber um dataset para fazer um processamento em uma determinada coluna, o que acontece se a coluna vier nula?"
+- "If my application is expecting to receive a CSV file, what happens if it receives an XLSX or Parquet file?"
+- "If my function expects to receive a dataset to process a specific column, what happens if the column is null?"
 
-Faça o teste e trate isso no código para que o teste dê certo! Quando você começa a pensar nessas situações, você começa a entrar numa inércia e vai pensando em cada vez mais situações. :D
+Test it and handle it in your code so that the test passes! When you start thinking about these situations, you begin to get into a rhythm and think of more and more scenarios. 😄
 
 ### Logging
 
-Once the ML has been deployed, it need to be monitored. Uma das formas mais elegantes de se fazer isso é utilizando a biblioteca [logging](https://docs.python.org/3/library/logging.html), uma vez que ela permite que o usuário defina diferentes níveis de logging, além do formato da mensagem, se o usuário deseja salvar em arquivo ou apenas mostrar no terminal etc. Isso nos permite, posteriormente, filtrar as mensagens por um determinado nível ou mesmo filtrar por uma determinada data, por exemplo. Dentre os níveis disponíveis, estão:
+Once the ML has been deployed, it needs to be monitored. One of the most elegant ways to do this is by using the [logging](https://docs.python.org/3/library/logging.html) library, as it allows the user to define different logging levels, message formats, whether to save to a file or just display in the terminal, and more. This allows us to later filter messages by a specific level or date, for example. Among the available levels are:
 
    - DEBUG: detailed information for debugging purposes
    - INFO: general confirmations that things are working as expected 
@@ -142,7 +148,8 @@ Once the ML has been deployed, it need to be monitored. Uma das formas mais eleg
    - CRITICAL: a very severe error that will likely lead to the application terminating
 
 ### Extra readings
-As práticas acima são apenas a ponta do iceberg nesse mundo de MLOps. Existem muitas que podem ser incorporadas dependendo do objetivo do seu projeto, da cultura da sua empresa, entre outras coisas. Como sugestão de leitura, caso você queira se aprofundar neste tema, destacam-se as seguintes referências:
+
+The practices mentioned above are just the tip of the iceberg in the world of MLOps. There are many more that can be incorporated depending on your project's goals, your company's culture, and other factors. As a reading suggestion, if you want to delve deeper into this topic, the following references stand out:
 
    - [Clean Code in Python](https://www.amazon.com/Clean-Code-Python-maintainable-efficient/dp/1800560214/ref=sr_1_1?crid=T8VO8D93FZQP&keywords=clean+code+in+python&qid=1696419564&sprefix=clean+code+in+%2Caps%2C196&sr=8-1)
    - [Clean Architecture](https://www.amazon.com/Clean-Architecture-Craftsmans-Software-Structure/dp/0134494164/ref=sr_1_1?crid=B68I1FZKKCOM&keywords=clean+architecture&qid=1696419582&sprefix=clean+a%2Caps%2C240&sr=8-1)
@@ -150,11 +157,12 @@ As práticas acima são apenas a ponta do iceberg nesse mundo de MLOps. Existem 
    
 ## Extras
 
-- Certificate of completion for the course: [Intermediate Python for Web Development]().
+- Certificate of completion for the course: [Intermediate Python for Web Development](https://app.dataquest.io/view_cert/6KK9V21038O0ZU3ECJ8M).
 - Explanaiton video: [Loom]().
 ## References
 
 - [Ivanovitch's Repository](https://github.com/ivanovitchm/mlops)
+- [Data Science at the Command Line - Jeroen Jansses](https://datascienceatthecommandline.com)
 - [Build a Movie Recommendation System in Python (Dataquest)](https://github.com/dataquestio/project-walkthroughs/blob/master/movie_recs/movie_recommendations.ipynb)
 - [Build an Airflow Data Pipeline to Download Podcasts (Dataquest)](https://github.com/dataquestio/project-walkthroughs/blob/master/podcast_summary/podcast_summary.py)
 - [Guided Project: Predicting Heart Disease (Dataquest)](https://github.com/dataquestio/solutions/blob/master/Mission740Solutions.ipynb)

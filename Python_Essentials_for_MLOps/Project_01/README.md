@@ -1,11 +1,12 @@
 # Build a Movie Recommendation System in Python
 
 ## Big picture
-Neste projeto, foi desenvolvido um sistema de recomendação de filmes utilizando o Python utilizando algumas das melhores práticas utilizadas para tornar o seu código, mais limpo, mais legível e mais fácil de depurar. O sistema consiste em alguns scripts execuátáveis por meio da linha de comando passando como parâmetros, por exemplo, o título de um filme que você gosta e quantos itens semelhantes você deseja que o sistema te retorne. 
+
+In this project, a movie recommendation system has been developed using Python, incorporating some of the best practices to make your code cleaner, more readable, and easier to debug. The system comprises several scripts executable via the command line, where you can pass parameters such as the title of a movie you like and how many similar items you want the system to return to you.
 
 ## How to execute
 
-Uma vez que as dependências estejam instaladas, basta você executar o comando abaixo substituindo "movie_title" pelo título do filme que você deseja.
+Once the dependencies are installed, simply execute the following command, replacing "movie-title" with the title of the movie you desire.
 
 ```
 python movie_recomendation.py --movie-title "Movie Title"
@@ -13,19 +14,19 @@ python movie_recomendation.py --movie-title "Movie Title"
 
 ### Execution Example
 
-Vamos tomar o exemplo que você deseja procurar por recomendações de filmes parecidos com Super Mario.
+Let's take an example where you want to search for movie recommendations similar to "Super Mario."
 
 ```
 python movie_recomendation.py --movie-title "Super Mario"
 ```
 
-O resultado no seu terminal deve ser algo semelhante ao mostrado na imagem abaixo.
+The output in your terminal should resemble what is shown in the image below.
 
 ![alt text](./images/execution.png)
 
 ## The code
 
-No arquivo [movie_recomendation.py](./movie_recomendation.py), foi utilizada a arquitetura `try - except` para verificar se o diretório dos dados já existe e depois para realizar o download propriamente dito dos dados a partir da url. Para isso, foi utilizada a biblioteca [tqdm](https://github.com/tqdm/tqdm) para mostrar uma barra de progresso no terminal para que o usuário não fique perdido sem saber uma estimativa do tempo do download ou mesmo se o programa ainda está executando como deveria. Caso ele não consiga realizar isso, o programa irá lançar uma exceção e informar para o usuário qual foi o erro.
+In the file [movie_recomendation.py](./movie_recomendation.py), the `try - except` architecture is used to check if the data directory already exists and then to perform the actual data download from the URL. To achieve this, the [tqdm](https://github.com/tqdm/tqdm) library is utilized to display a progress bar in the terminal, providing the user with an estimate of the download time or confirming that the program is still executing as expected. If it fails to do so, the program will raise an exception and inform the user about the error.
 
 ```python
 try:
@@ -45,7 +46,11 @@ except zipfile.BadZipFile:
     logging.error("The downloaded file is not a valid ZIP file.")
 ```
 
-Com os dados no seu devido lugar, nós podemos instânciar o objeto que irá receber e processar os argumentos informados na linha de comando, o `ArgumentParser`. Neste ponto, será realizada uma verificação do formato do título informado, o carregamento do conjunto de dados, a limpeza dos caracteres especiais presentes nos títulos.
+With the data in its proper place, you can instantiate the object that will receive and process the arguments provided on the command line, which is the `ArgumentParser`. At this point, the program will perform the following tasks:
+
+1. Verify the format of the title provided.
+2. Load the dataset.
+3. Clean the special characters present in the movie titles.
 
 ```python
 # create the parser
@@ -72,7 +77,7 @@ logging.info("Cleaning the movie title")
 movies_df["clean_title"] = movies_df["title"].apply(clean_movie_title)
 ```
 
-Em seguida, instânciou-se um `TfidfVectorizer` para transformar os títulos dos filmes em vetores e, com isso, poder buscar os filmes com os títulos mais parecidos. Ok, isso já é bem legal, mas vamos combinar que podemos fazer melhor do que é isso num é?! Que tal recomendar filmes similares com base no consumo e na nota de outros usários?
+Next, a `TfidfVectorizer` was instantiated to transform movie titles into vectors, allowing us to search for movies with similar titles. Okay, that's pretty cool already, but let's agree that we can do better than that, right? How about recommending similar movies based on the consumption and ratings of other users?
 
 ```python
 # instantiate the TF-IDF vectorizer
@@ -90,6 +95,9 @@ results = get_most_similar_movies_by_title(movies_df, tfidf_vectorizer, movie_ti
 
 No arquivo [ratings.csv](./data/ratings.csv), nós podemos encontrar a nota que cada usuário deu para um determinado `movieId` e, através dessa coluna, nós podemos pegar o respectivo nome do filme no arquivo [movies.csv](./data/movies.csv). A função responsável por realizar essa busca é definida como `find_similar_movies()` e pode ser encontrada no arquivo [utils.py](./utils.py).
 
+
+In the file [ratings.csv](./data/ratings.csv), we can find the rating that each user gave to a specific movieId, and through this column, we can retrieve the corresponding movie name from the file [movies.csv](./data/movies.csv). The function responsible for performing this search is defined as `find_similar_movies()` and can be found in the file [utils.py](./utils.py).
+
 ```python
 # movie_recomendation.py
 
@@ -101,29 +109,29 @@ results = find_similar_movies(movies_df, ratings_df, movie_title)
 
 ## How to add more movies (Pytest)
 
-A cada dia, são lançados novos filmes e, com isso, é desejável manter a nossa base de dados atualizada não é? Então, se você deseja fazer isso sem compromenter a exeução correta do código, eu criei alguns testes que irão amenizar a chance de ocorrer algum problema durante a execução. 
+Every day, new movies are released, and as a result, it is desirable to keep our database updated, isn't it? So, if you want to do this without compromising the correct execution of the code, I have created some tests that will reduce the chance of any problems occurring during execution.
 
-No arquivo [conftest.py](./conftest.py), você irá encontrar uma fixture que irá carregar os datasets em memória para poderem ser utilizados nos testes. Já no arquivo [test_data.py](./test/test_data.py), você irá encontrar testes que verificam, por exemplo, se o tipo de cada coluna está de acordo com o esperado, se há um número mínimo de linhas desejável, se os datasets possuem as colunas com os respectivos nomes esperados, entre outros. Sinta-se livre para adicionar mais testes na sua aplicação, eles são muito importantes e podem economizar muito tempo de depuração dos erros.
+In the file [conftest.py](./conftest.py), you will find a fixture that loads the datasets into memory so they can be used in the tests. In the file [test_data.py](./test/test_data.py), you will find tests that check, for example, if the data types of each column are as expected, if there is a minimum number of desirable rows, if the datasets have columns with the expected names, among other things. Feel free to add more tests to your application; they are very important and can save a lot of debugging time.
 
-Para executar todos os testes, basta você rodar o comando abaixo:
+To run all the tests, simply execute the command below:
 
 ```
 pytest
 ```
 
-Para executar algum arquivo de teste específico, você pode passar o nome do arquivo, por exemplo:
+To run a specific test file, you can pass the file name, for example:
 
 ```
 pytest test/test_data.py
 ```
 
-O resultado da execução deste comando pode ser visualizado na imagem abaixo:
+The result of executing this command can be seen in the image below:
 
 ![alt text](./images/pytest.png)
 
 ## Clean codes Principles
 
-Note que, em relação a [solução original](https://github.com/dataquestio/solutions/blob/master/Mission740Solutions.ipynb), vários nomes de variáveis e de funções foram alterados de forma a deixar o código mais legível, além da modularização de alguns passos do pipeline e da adição do tratamento de exceções e da adição de loggings. Além disso, realizou-se a documentação das funções e, formato docstring e utilizando a dica de tipo, como mostra o exemplo da função abaixo:
+Note that, compared to the [original solution](https://github.com/dataquestio/solutions/blob/master/Mission740Solutions.ipynb), several variable and function names have been changed to make the code more readable. Additionally, some steps of the pipeline have been modularized, exception handling has been added, and logging has been incorporated. Furthermore, documentation for functions has been provided, including docstring format and type hints, as shown in the example function below:
 
 ```python
 def clean_movie_title(raw_movie_title: str) -> str:
@@ -142,15 +150,15 @@ def clean_movie_title(raw_movie_title: str) -> str:
 
 ## Code style
 
-Note que eu tentei deixar o nome das variáveis da forma mais legível possível, bem como os nomes dos testes. Em adição à docstring, o código ficou mais limpo e mais legível, melhorando assim a sua legibilidade. Em relação ao Pylint, eu consegui uma nota 10/10. Não fique tão obcecado em alcançar a nota máxima. É preciso ter bom censo e ser crítico em relação à algumas coisas como a quantidade de espaços na identação, pois dependendo da resolução da tela que você está olhando, dois espaços podem ser mais interessantes do que quatro. 
+Please note that I tried to make variable names as readable as possible, as well as test names. In addition to the docstring, the code became cleaner and more readable, thus improving its overall readability. Regarding Pylint, I achieved a score of 10/10. However, don't become overly obsessed with reaching the maximum score. It's essential to use good judgment and be critical about certain things, such as the number of spaces in indentation, as it may vary depending on the screen resolution you are working with; sometimes two spaces might be more appropriate than four.
 
-Para executar o Pylint, basta você rodar o seguinte comando:
+To run Pylint, you can simply execute the following command:
 
 ```
 pylint filename
 ```
 
-Abaixo encontram-se alguns exemplos de execução e os seus resultados:
+Below are some examples of execution and their results:
 
 - ```pylint movie_recomendation.py```
 
@@ -165,7 +173,7 @@ Abaixo encontram-se alguns exemplos de execução e os seus resultados:
 ![alt text](./images/pylint_03.png)
 ## Copyrights
 
-Este projeto foi adaptado de um `Portfolio Project` do site [Dataquest](https://www.dataquest.io/). Em relação à [solução original](https://github.com/dataquestio/project-walkthroughs/blob/master/movie_recs/movie_recommendations.ipynb), foi realizada a adaptação de um Jupyter notebook com um sistema de recomendação interativo para scripts em python com o intuito de facilitar e viabilizar a utilização do Pylint, do AutoPep8 e da passagem de argumentos através da linha de comando.
+This project was adapted from a `Portfolio Project` on the [Dataquest](https://www.dataquest.io/) website. Compared to the [original solution](https://github.com/dataquestio/project-walkthroughs/blob/master/movie_recs/movie_recommendations.ipynb), it involved transforming a Jupyter notebook with an interactive recommendation system into Python scripts to facilitate and enable the use of Pylint, AutoPep8, and command-line argument passing.
 
 ## References
 
