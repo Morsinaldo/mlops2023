@@ -82,6 +82,8 @@ In [podcast.py](./dags/podcast.py) file, adjust the `PROJECT_FOLDER` variable to
 PROJECT_FOLDER = "/home/morsinaldo/Desktop/mlops2023/Python_Essentials_for_MLOps/Project_02"
 ```
 
+Check if the connection was added correctly
+
 ```
 airflow connections get podcasts
 ```

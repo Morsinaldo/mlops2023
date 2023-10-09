@@ -112,7 +112,7 @@ accuracy = accuracy_score(y_test, y_pred)
 logging.info("The accuracy of the model is %s", accuracy)
 ```
 
-If the user desires, they can also perform hyperparameter tuning of the model through a Bayesian parameter search. By default, this option is set to False, but the user can activate it by setting the `hyperparameter_tuning` parameter to True when executing the script via the command line. The code that performs this procedure is shown below.
+If the user desires, they can also perform hyperparameter tuning of the model through a grid parameter search. By default, this option is set to False, but the user can activate it by setting the `hyperparameter_tuning` parameter to True when executing the script via the command line. The code that performs this procedure is shown below.
 
 ```python
 if args.hyperparameter_tuning == True:
@@ -123,7 +123,10 @@ if args.hyperparameter_tuning == True:
 
     # define the search
     logging.info("Instantiating the search")
-    search = BayesSearchCV(knn, hyperparameters, cv=5)
+    search = GridSearchCV(estimator=knn,
+                          param_grid=hyperparameters,
+                          scoring="accuracy",
+                          n_jobs=-1)
 
     # fit the search
     logging.info("Fitting the model")
