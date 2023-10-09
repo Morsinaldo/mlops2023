@@ -76,7 +76,11 @@ Create a connection to the database
 airflow connections add 'podcasts' --conn-type 'sqlite' --conn-host 'your_path/mlops2023/Python_Essentials_for_MLOps/Project_02/dags/episodes.db'
 ```
 
-Check to make sure there are data (optional)
+In [podcast.py](./dags/podcast.py) file, adjust the `PROJECT_FOLDER` variable to your machine
+
+```python
+PROJECT_FOLDER = "/home/morsinaldo/Desktop/mlops2023/Python_Essentials_for_MLOps/Project_02"
+```
 
 ```
 airflow connections get podcasts
@@ -88,7 +92,7 @@ Now, just run `airflow standalone` again to load the changes made. If you click 
 
 ## The code
 
-In general, we first have the creation of a DAG (Directed Acyclic Graph) named 'podcast_summary', which was configured to run daily starting from May 30, 2022. Below, the code shows the creation of the DAG and the definition of the `podcast_summary()`` function, which contains the execution of the `tasks`. The complete code can be found in [podcast.py](./dags/podcast.py).
+In general, we first have the creation of a DAG (Directed Acyclic Graph) named 'podcast_summary', which was configured to run daily starting from May 30, 2022. Below, the code shows the creation of the DAG and the definition of the `podcast_summary()` function, which contains the execution of the `tasks`. The complete code can be found in [podcast.py](./dags/podcast.py).
 
 ```python
 # create a DAG
