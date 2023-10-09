@@ -11,9 +11,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-from skopt import BayesSearchCV
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.metrics import accuracy_score
 from sklearn.neighbors import KNeighborsClassifier
 
@@ -121,7 +120,10 @@ if args.hyperparameter_tuning is True:
 
     # define the search
     logging.info("Instantiating the search")
-    search = BayesSearchCV(knn, hyperparameters, cv=5)
+    search = GridSearchCV(estimator=knn,
+                          param_grid=hyperparameters,
+                          scoring="accuracy",
+                          n_jobs=-1)
 
     # fit the search
     logging.info("Fitting the model")

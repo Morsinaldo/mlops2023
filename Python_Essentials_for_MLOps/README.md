@@ -114,7 +114,7 @@ Great! This will help many other people, but how can I make this process faster?
 ### Linting
 
 In this regard, there are several tools that can assist us in writing standardized code. The first of these is [autopep8](https://pypi.org/project/autopep8/), which generally automates the formatting of our code to the PEP8 standard, making changes directly to the file. [Pylint](https://www.pylint.org/) is a library that analyzes and generates a score from 0 to 10 for our code, informing the user of non-compliance with the standard, and allowing the user to make the necessary modifications. [pycodestyle](https://pypi.org/project/pycodestyle/) is quite similar to pylint, with the difference that it doesn't generate a score; it simply indicates the modifications needed. The linting tools will be shown in more detail in the context of each project.
-### Tratamento de Erros
+### Error Handling
 
 This point is very important because in a production scenario, many errors can occur, and we must be prepared to mitigate them as quickly as possible. For example, some errors that can occur are:
 
