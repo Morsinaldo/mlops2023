@@ -6,7 +6,7 @@ Before delving into the fabulous world of Machine Learning Operations (MLOps), t
 
 With this in mind, three projects have been developed to explore some of these best practices, which will be explained in more detail below. You can also check out [my video]() explaining the overall functionality of each project.
 
-## Projetos Desenvolvidos
+## Projects
    - [Movie System Recomendation](./Project_01/): In this project, a movie recommendation system was developed, where the user provides a title, and the algorithm searches for the most similar movie titles in its database, providing movie recommendations based on the preferences of other users with similar consumption patterns.
    - [Airflow Data Pipeline to Download Podcasts](./Project_02/): In this project, a graph-based pipeline using Apache Airflow was developed for the automatic extraction of podcast files. This ensures that the data is already extracted, processed, and stored for consumption by a machine learning model, for example.
    - [Predicting Heart Disease](./Project_03/): In this project, a script was developed to automate the training of a model capable of predicting heart diseases based on a patient's clinical data. The user can also choose whether to perform hyperparameter tuning and define the percentage of the dataset to be used for testing.
