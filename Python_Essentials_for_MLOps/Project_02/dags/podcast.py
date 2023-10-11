@@ -21,7 +21,7 @@ from pydub import AudioSegment
 
 # set constants
 PODCAST_URL = "https://www.marketplace.org/feed/podcast/marketplace/"
-PROJECT_FOLDER = "/Users/morsinaldo/Desktop/mlops2023/Python_Essentials_for_MLOps/Project_02"
+PROJECT_FOLDER = "/home/morsinaldo/Desktop/mlops2023/Python_Essentials_for_MLOps/Project_02"
 EPISODE_FOLDER = PROJECT_FOLDER + "/dags/episodes"
 FRAME_RATE = 16000
 
