@@ -4,7 +4,7 @@ Before delving into the fabulous world of Machine Learning Operations (MLOps), t
 
 ![alt text](./images/header.png)
 
-With this in mind, three projects have been developed to explore some of these best practices, which will be explained in more detail below. You can also check out [my video]() explaining the overall functionality of each project.
+With this in mind, three projects have been developed to explore some of these best practices, which will be explained in more detail below. You can also check out [my video](https://www.loom.com/share/c6fa1d2a41b54834b058611e813de0bd?sid=2607d23c-92c0-4ddb-a816-c2f613c2ad4a) explaining the overall functionality of each project.
 
 ## Projects
    - [Movie System Recomendation](./Project_01/): In this project, a movie recommendation system was developed, where the user provides a title, and the algorithm searches for the most similar movie titles in its database, providing movie recommendations based on the preferences of other users with similar consumption patterns.
@@ -158,7 +158,8 @@ The practices mentioned above are just the tip of the iceberg in the world of ML
 ## Extras
 
 - Certificate of completion for the course: [Intermediate Python for Web Development](https://app.dataquest.io/view_cert/6KK9V21038O0ZU3ECJ8M).
-- Explanaiton video: [Loom]().
+- Explanaiton video: [Loom](https://www.loom.com/share/c6fa1d2a41b54834b058611e813de0bd?sid=2607d23c-92c0-4ddb-a816-c2f613c2ad4a).
+
 ## References
 
 - [Ivanovitch's Repository](https://github.com/ivanovitchm/mlops)
