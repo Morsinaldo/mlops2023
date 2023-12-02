@@ -8,7 +8,9 @@ Morsinaldo de Azevedo Medeiros is currently pursuing an undergraduate degree in 
 MLOps, or Machine Learning Operations, is the practice of streamlining the entire machine learning lifecycle, from development to deployment and monitoring. Its significance lies in its ability to ensure reproducibility, scalability, and reliability in machine learning workflows. In today's AI-driven landscape, MLOps plays a crucial role in managing complex machine learning models, fostering collaboration among teams, and facilitating rapid model deployment, maintenance, and performance monitoring. Thus, this repository contains the projects developed during the MLOps course offered by the UFRN, taught by Professor Ivanovitch Silva.
 
 ## 📂 Projects
+
 - [Python Essentials for MLOps](./Python_Essentials_for_MLOps/)
+- [Classifying Tweets](./Classifying_Tweets/)
 
 🔜 More content will be added as the course progresses.
 
