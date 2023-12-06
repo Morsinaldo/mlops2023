@@ -93,6 +93,36 @@ Regarding the original solution, other increments were made such as the generati
 
 Finally, there is the test stage of the trained model with the dataset that it has never seen. However, this step is not yet available, as the Kaggle competition has not yet ended. So, the real labels of the test set are not yet available.
 
+## Results
+
+The graph of accuracy and loss for both the training and validation set is illustrated in the figure below.
+
+
+<p align="center">
+  <img src="./images/train_valid_loss_acc.png" alt="alt text">
+</p>
+
+The resulting confusion matrix is illustrated in the figure below.
+
+<p align="center">
+  <img src="./images/confusion_matrix.png" alt="alt text">
+</p>
+
+The metrics obtained are below:
+
+- Train Accuracy: 0.9780
+- Validation Accuracy: 0.8116
+- Train Loss: 0.0542
+- Validation Loss: 0.8966
+
+- Energy consumed for RAM: 0.000589 kWh
+- Energy consumed for all GPU: 0.008069 kWh
+- Energy consumed for all CPU: 0.005263 kWh
+- CO2 emission 0.006301 (in Kg)
+
+It is important to note that these figures illustrate the training carried out on Google Colaboratory, due to training time reasons. In the Airflow pipeline, training was configured for only one epoch on CPU for validation purposes. In addition, the batch size of the training was reduced to meet the limitations of the Docker container. Future work involves setting up a more robust container configured to use the GPU.
+
+
 ## Getting Started
 
 ### Prerequisites
@@ -138,35 +168,6 @@ Password: airflow
 ```
 
 After that, DAG will be available in the main page. You can trigger it manually.
-
-## Results
-
-The graph of accuracy and loss for both the training and validation set is illustrated in the figure below.
-
-
-<p align="center">
-  <img src="./images/train_valid_loss_acc.png" alt="alt text">
-</p>
-
-The resulting confusion matrix is illustrated in the figure below.
-
-<p align="center">
-  <img src="./images/confusion_matrix.png" alt="alt text">
-</p>
-
-The metrics obtained are below:
-
-- Train Accuracy: 0.9780
-- Validation Accuracy: 0.8116
-- Train Loss: 0.0542
-- Validation Loss: 0.8966
-
-- Energy consumed for RAM: 0.000589 kWh
-- Energy consumed for all GPU: 0.008069 kWh
-- Energy consumed for all CPU: 0.005263 kWh
-- CO2 emission 0.006301 (in Kg)
-
-It is important to note that these figures illustrate the training carried out on Google Colaboratory, due to training time reasons. In the Airflow pipeline, training was configured for only one epoch on CPU for validation purposes. In addition, the batch size of the training was reduced to meet the limitations of the Docker container. Future work involves setting up a more robust container configured to use the GPU.
 
 ## Copyrights
 
