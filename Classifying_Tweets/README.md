@@ -169,6 +169,10 @@ Password: airflow
 
 After that, DAG will be available in the main page. You can trigger it manually.
 
+## Extras
+
+- [Youtube video](https://youtu.be/Ys423ZA_l00)
+
 ## Copyrights
 
 This project was adapted from a `Guided Project` on the [Dataquest](https://www.dataquest.io/) website. Compared to the [original solution](https://github.com/dataquestio/solutions/blob/master/Mission797Solutions.ipynb), it involved transforming a Jupyter notebook into Python scripts to facilitate and enable the use with the Apache Airflow.
