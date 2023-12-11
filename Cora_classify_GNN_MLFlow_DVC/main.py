@@ -3,13 +3,11 @@ import hydra
 import mlflow
 from omegaconf import DictConfig
 
+artifact_folder = "artifacts"
+
 # This automatically reads in the configuration
 @hydra.main(config_name='config')
 def process_args(config: DictConfig):
-
-    # Setup the wandb experiment. All runs will be grouped under this name
-    # os.environ["WANDB_PROJECT"] = config["main"]["project_name"]
-    # os.environ["WANDB_RUN_GROUP"] = config["main"]["experiment_name"]
 
     # You can get the path at the root of the MLflow project with this:
     root_path = hydra.utils.get_original_cwd()
@@ -28,9 +26,7 @@ def process_args(config: DictConfig):
             os.path.join(root_path, "fetch_data"),
             "main",
             parameters={
-                "artifact_name": "raw_data.csv",
-                "url": config["data"]["file_url"],
-                "dataset": config["data"]["dataset"],
+                "artifact_folder": artifact_folder,
             }
         )
 

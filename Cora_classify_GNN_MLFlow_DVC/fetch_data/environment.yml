@@ -1,0 +1,12 @@
+name: fetch_data
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pip
+  - pip:
+      - numpy==1.26.2
+      - pandas==2.1.4
+      - tensorflow==2.15.0
+      - mlflow
