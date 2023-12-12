@@ -4,6 +4,7 @@ import mlflow
 from omegaconf import DictConfig
 
 artifact_folder = "artifacts"
+figures_folder = "figures"
 
 # This automatically reads in the configuration
 @hydra.main(config_name='config')
@@ -21,12 +22,71 @@ def process_args(config: DictConfig):
 
     # Download step
     if "fetch_data" in steps_to_execute:
+        with mlflow.start_run():
+            _ = mlflow.run(
+                os.path.join(root_path, "fetch_data"),
+                "main",
+                parameters={
+                    "artifact_folder": artifact_folder,
+                }
+            )
+            # Adiciona os artefatos ao controle do DVC
+            os.system(f"dvc add ./{artifact_folder}")
+            os.system(f"dvc push")
+
+        # _ = mlflow.run(
+        #     os.path.join(root_path, "fetch_data"),
+        #     "main",
+        #     parameters={
+        #         "artifact_folder": artifact_folder,
+        #     }
+        # )
+    
+    # EDA step
+    if "eda" in steps_to_execute:
 
         _ = mlflow.run(
-            os.path.join(root_path, "fetch_data"),
+            os.path.join(root_path, "eda"),
+            "main",
+            parameters={
+                "figures_folder": figures_folder,
+                "artifact_folder": artifact_folder,
+            }
+        )
+
+
+    # Preprocessing step
+    if "preprocessing" in steps_to_execute:
+
+        _ = mlflow.run(
+            os.path.join(root_path, "preprocessing"),
+            "main",
+            parameters={
+                "figures_folder": figures_folder,
+                "artifact_folder": artifact_folder,
+            }
+        )
+
+    # Data segregation step
+    if "data_segregation" in steps_to_execute:
+
+        _ = mlflow.run(
+            os.path.join(root_path, "data_segregation"),
             "main",
             parameters={
                 "artifact_folder": artifact_folder,
+            }
+        )
+
+    # Training step
+    if "train" in steps_to_execute:
+
+        _ = mlflow.run(
+            os.path.join(root_path, "train"),
+            "main",
+            parameters={
+                "artifact_folder": artifact_folder,
+                "figures_folder": figures_folder,
             }
         )
 

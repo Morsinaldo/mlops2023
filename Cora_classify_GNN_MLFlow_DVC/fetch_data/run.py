@@ -46,17 +46,14 @@ def process_args(args):
         os.path.join(data_dir, "cora.content"), sep="\t", header=None, names=column_names,
     )
 
-    if not os.path.exists(args.artifact_folder):
-        os.makedirs(args.artifact_folder)
+    if not os.path.exists(f"../{args.artifact_folder}"):
+        os.makedirs(f"../{args.artifact_folder}")
 
     # save the data
     logger.info("Saving the data...")
-    citations.to_csv(f"{args.artifact_folder}/citations.csv", index=False)
-    papers.to_csv(f"{args.artifact_folder}/papers.csv", index=False)
+    citations.to_csv(f"../{args.artifact_folder}/citations.csv", index=False)
+    papers.to_csv(f"../{args.artifact_folder}/papers.csv", index=False)
     logger.info("Done!")
-
-    # Log artifacts using MLflow
-    # mlflow.log_artifacts(args.artifact_folder, run_id=run.info.run_id)
 
     # End MLflow run
     # mlflow.end_run()

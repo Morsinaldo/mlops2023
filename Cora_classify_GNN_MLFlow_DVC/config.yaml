@@ -1,0 +1,14 @@
+main:
+  project_name: cora_classify_gnn_mlflow_dvc
+  experiment_name: dev
+  execute_steps:
+    - fetch_data
+    - eda
+    - preprocessing
+    - data_segregation
+    - train
+    - test
+  # This seed will be used to seed the random number generator
+  # to ensure repeatibility of the data splits and other
+  # pseudo-random operations
+  random_seed: 44

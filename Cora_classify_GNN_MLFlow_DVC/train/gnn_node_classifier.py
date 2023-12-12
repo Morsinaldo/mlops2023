@@ -54,10 +54,10 @@ def display_learning_curves(history):
     ax2.set_ylabel("Accuracy")
     plt.show()
 
-    if not os.path.exists("figures"):
-        os.makedirs("figures")
+    if not os.path.exists("../figures"):
+        os.makedirs("../figures")
 
-    plt.savefig("figures/learning_curves.png")
+    plt.savefig("../figures/learning_curves.png")
 
     plt.close()
 

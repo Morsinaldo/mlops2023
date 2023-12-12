@@ -1,0 +1,15 @@
+name: eda
+conda_env: environment.yml
+
+entry_points:
+    main:
+        parameters:
+            figures_folder:
+                description: Name of the Figure folder that will store the graphs
+                type: str
+            artifact_folder:
+                description: Name of the Artifact folder that will store the artifacts
+                type: str
+
+        command: >-
+            python run.py --figures_folder {figures_folder} --artifact_folder {artifact_folder}

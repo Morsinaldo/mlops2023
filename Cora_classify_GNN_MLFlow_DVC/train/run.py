@@ -1,7 +1,8 @@
 import os
 import mlflow
 import logging
-import numpy as np
+import argparse
+# import numpy as np
 import pandas as pd
 import tensorflow as tf
 import matplotlib.pyplot as plt
@@ -29,15 +30,14 @@ dropout_rate = 0.5
 num_epochs = 300
 batch_size = 256
 
-# Start MLflow run
-with mlflow.start_run():
+def process_args(args):
 
     # read files
     logger.info("Reading files...")
-    train_data = pd.read_csv("../data_segregation/data/train_data.csv")
-    test_data = pd.read_csv("../data_segregation/data/test_data.csv")
-    papers = pd.read_csv("../preprocessing/data_cleaned/papers.csv")
-    citations = pd.read_csv("../preprocessing/data_cleaned/citations.csv")
+    train_data = pd.read_csv(f"../{args.artifact_folder}/train_data.csv")
+    test_data = pd.read_csv(f"../{args.artifact_folder}/test_data.csv")
+    papers = pd.read_csv(f"../{args.artifact_folder}/papers_cleaned.csv")
+    citations = pd.read_csv(f"../{args.artifact_folder}/citations_cleaned.csv")
 
     class_values = sorted(papers["subject"].unique())
     class_idx = {name: id for id, name in enumerate(class_values)}
@@ -91,9 +91,33 @@ with mlflow.start_run():
     logger.info(f"Test accuracy: {round(test_accuracy * 100, 2)}%")
 
     # Log metrics using MLflow
-    mlflow.log_metric("test_accuracy", test_accuracy)
+    # mlflow.log_metric("test_accuracy", test_accuracy)
 
     # Log model using MLflow
-    mlflow.tensorflow.log_model(gnn_model, "model")
+    # mlflow.tensorflow.log_model(gnn_model, "model")
 
     logger.info("Done!")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Cora classification with GNNs")
+
+    parser.add_argument(
+        "--figures_folder",
+        type=str,
+        default="figures",
+        help="Folder where the data will be saved",
+    )
+
+    parser.add_argument(
+        "--artifact_folder",
+        type=str,
+        default="artifacts",
+        help="Folder where the data will be saved",
+    )
+
+    args = parser.parse_args()
+
+    process_args(args)
+
+# Run this script with:
+    # mlflow run . -P figures_folder=figures artifact_folder=artifacts

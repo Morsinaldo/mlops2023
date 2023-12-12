@@ -1,0 +1,12 @@
+name: data_segregation
+conda_env: environment.yml
+
+entry_points:
+    main:
+        parameters:
+            artifact_folder:
+                description: Name of the Artifact folder that will store the artifacts
+                type: str
+
+        command: >-
+            python run.py --artifact_folder {artifact_folder}
