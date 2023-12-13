@@ -31,7 +31,8 @@ def process_args(config: DictConfig):
                 }
             )
             # Adiciona os artefatos ao controle do DVC
-            os.system(f"dvc add ./{artifact_folder}")
+            os.system(f"dvc add ./{artifact_folder}/citations.csv")
+            os.system(f"dvc add ./{artifact_folder}/papers.csv")
             os.system(f"dvc push")
 
         # _ = mlflow.run(
@@ -45,14 +46,28 @@ def process_args(config: DictConfig):
     # EDA step
     if "eda" in steps_to_execute:
 
-        _ = mlflow.run(
-            os.path.join(root_path, "eda"),
-            "main",
-            parameters={
-                "figures_folder": figures_folder,
-                "artifact_folder": artifact_folder,
-            }
-        )
+        with mlflow.start_run():
+            _ = mlflow.run(
+                os.path.join(root_path, "eda"),
+                "main",
+                parameters={
+                    "figures_folder": figures_folder,
+                    "artifact_folder": artifact_folder,
+                }
+            )
+            # Adiciona os artefatos ao controle do DVC
+            os.system(f"dvc add ./{figures_folder}/citations.png")
+            os.system(f"dvc add ./{figures_folder}/papers.png")
+            os.system(f"dvc push")
+
+        # _ = mlflow.run(
+        #     os.path.join(root_path, "eda"),
+        #     "main",
+        #     parameters={
+        #         "figures_folder": figures_folder,
+        #         "artifact_folder": artifact_folder,
+        #     }
+        # )
 
 
     # Preprocessing step
