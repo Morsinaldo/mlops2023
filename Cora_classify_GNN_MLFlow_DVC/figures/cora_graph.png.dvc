@@ -1,0 +1,5 @@
+outs:
+- md5: a9a6292285be511815ed764e7b86ed1f
+  size: 259250
+  hash: md5
+  path: cora_graph.png
