@@ -10,6 +10,12 @@ logging.basicConfig(level=logging.INFO,
 # reference for a logging obj
 logger = logging.getLogger()
 
+# Set our tracking server uri for logging
+mlflow.set_tracking_uri(uri="http://127.0.0.1:5000")
+
+# Create a new MLflow Experiment
+mlflow.set_experiment("Multiclass Text Classification")
+
 
 def fetch_data(url: str, artifact_folder: str):
     """
@@ -22,17 +28,18 @@ def fetch_data(url: str, artifact_folder: str):
     artifact_folder : str
         Folder to save the data.
     """
-    with mlflow.start_run():
-        if not os.path.exists(artifact_folder):
-            os.makedirs(artifact_folder)
+    # mlflow.start_run()
+    if not os.path.exists(artifact_folder):
+        os.makedirs(artifact_folder)
 
-        # Download the data
-        try:
-            os.system(f"wget {url} -O {artifact_folder}/bbc-text.csv")
-        except Exception as e:
-            logger.error(e)
+    # Download the data
+    try:
+        os.system(f"wget {url} -O {artifact_folder}/bbc-text.csv")
+    except Exception as e:
+        logger.error(e)
 
-        # log the artifact
-        mlflow.log_artifact(f"{artifact_folder}/bbc-text.csv")
-        logger.info("Data downloaded successfully!")
+    # log the artifact
+    mlflow.log_artifact(f"{artifact_folder}/bbc-text.csv")
+    logger.info("Data downloaded successfully!")
+    # mlflow.end_run()
     

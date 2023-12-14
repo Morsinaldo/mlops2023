@@ -13,6 +13,12 @@ logging.basicConfig(level=logging.INFO,
 # reference for a logging obj
 logger = logging.getLogger()
 
+# Set our tracking server uri for logging
+mlflow.set_tracking_uri(uri="http://127.0.0.1:5000")
+
+# Create a new MLflow Experiment
+mlflow.set_experiment("Multiclass Text Classification")
+
 def data_segregation(artifact_folder: str):
 
     with mlflow.start_run():

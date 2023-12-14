@@ -1,4 +1,4 @@
-from sklearn.pipeline import Pipeline
+import mlflow
 
 from fetch_data import fetch_data
 from eda import eda
@@ -11,10 +11,10 @@ def main():
     Main function.
     """
 
-    # fetch_data(
-    #     url="https://huggingface.co/datasets/SetFit/bbc-news/raw/main/bbc-text.csv",
-    #     artifact_folder="artifacts"
-    # )
+    fetch_data(
+        url="https://huggingface.co/datasets/SetFit/bbc-news/raw/main/bbc-text.csv",
+        artifact_folder="artifacts"
+    )
 
     # eda(
     #     figures_folder="figures",
@@ -29,9 +29,9 @@ def main():
     #     artifact_folder="artifacts"
     # )
 
-    train(
-        artifact_folder="artifacts"
-    )
+    # train(
+    #     artifact_folder="artifacts"
+    # )
 
 if __name__ == "__main__":
     main()

@@ -65,3 +65,5 @@ def train(artifact_folder: str):
         # log the artifact
         logger.info("Logging the artifacts...")
         mlflow.log_artifact("bert_trained")
+
+        mlflow.log_metric("val_loss", learner.history.history['val_loss'][0])
