@@ -1,6 +1,7 @@
 import os
 import mlflow
 import logging
+import requests
 
 # configure logging
 logging.basicConfig(level=logging.INFO,
@@ -10,12 +11,7 @@ logging.basicConfig(level=logging.INFO,
 # reference for a logging obj
 logger = logging.getLogger()
 
-# Set our tracking server uri for logging
-mlflow.set_tracking_uri(uri="http://127.0.0.1:5000")
-
-# Create a new MLflow Experiment
-mlflow.set_experiment("Multiclass Text Classification")
-
+# mlflow server --host 127.0.0.1 --port 5000
 
 def fetch_data(url: str, artifact_folder: str):
     """
@@ -28,18 +24,34 @@ def fetch_data(url: str, artifact_folder: str):
     artifact_folder : str
         Folder to save the data.
     """
-    # mlflow.start_run()
-    if not os.path.exists(artifact_folder):
-        os.makedirs(artifact_folder)
+    # Set our tracking server uri for logging
+    mlflow.set_tracking_uri(uri="http://127.0.0.1:5000")
 
-    # Download the data
-    try:
-        os.system(f"wget {url} -O {artifact_folder}/bbc-text.csv")
-    except Exception as e:
-        logger.error(e)
+    # Create a new MLflow Experiment
+    mlflow.set_experiment("Multiclass Text Classification")
 
-    # log the artifact
-    mlflow.log_artifact(f"{artifact_folder}/bbc-text.csv")
-    logger.info("Data downloaded successfully!")
-    # mlflow.end_run()
+    with mlflow.start_run(run_name="fetch_data"):
+ 
+        if not os.path.exists(artifact_folder):
+            os.makedirs(artifact_folder)
+
+        # Download the data
+        try:
+            requests.get(url)
+
+            # Download the data
+            logger.info("Downloading the data...")
+            data = requests.get(url).content
+
+            # Save the data
+            logger.info("Saving the data...")
+            with open(f"{artifact_folder}/bbc-text.csv", "wb") as f:
+                f.write(data)
+        except Exception as e:
+            logger.error(e)
+
+        # log the artifact
+        mlflow.log_artifact(f"{artifact_folder}/bbc-text.csv")
+        logger.info("Data downloaded successfully!")
+
     

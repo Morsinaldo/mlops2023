@@ -8,6 +8,8 @@ from textblob import Word
 from nltk.corpus import stopwords
 from nltk.tokenize import RegexpTokenizer
 
+from eda import get_raw_data_artifact
+
 nltk.download('stopwords')
 nltk.download('wordnet')
 nltk.download('omw-1.4')
@@ -24,12 +26,6 @@ logging.basicConfig(level=logging.INFO,
 # reference for a logging obj
 logger = logging.getLogger()
 
-# Set our tracking server uri for logging
-mlflow.set_tracking_uri(uri="http://127.0.0.1:5000")
-
-# Create a new MLflow Experiment
-mlflow.set_experiment("Multiclass Text Classification")
-
 def preprocessing(artifact_folder: str):
     """
     Preprocess the data.
@@ -39,8 +35,19 @@ def preprocessing(artifact_folder: str):
     artifact_folder : str
         Folder to save the data.
     """
-    with mlflow.start_run():
-        logger.info("Starting EDA...")
+    # Set our tracking server uri for logging
+    mlflow.set_tracking_uri(uri="http://127.0.0.1:5000")
+
+    # Create a new MLflow Experiment
+    mlflow.set_experiment("Multiclass Text Classification")
+
+    # get the raw data artifact
+    logger.info("Getting the raw data artifact...")
+    get_raw_data_artifact()
+    logger.info("Raw data artifact downloaded successfully!")
+
+    with mlflow.start_run(run_name="preprocessing"):
+        logger.info("Starting Preprocessing...")
 
         # read raw data artifact
         logger.info("Reading the raw data...")
