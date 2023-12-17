@@ -2,75 +2,97 @@
 
 ## Big Picture
 
-Neste projeto, foi desenvolvido um pipeline para a classificação multiclasse de textos utilizando o [MLFlow](https://mlflow.org/) para orquestrar a execução dos scripts e o [Gradio](https://www.gradio.app/) para realizar consumir o modelo e realizar a inferências. A solução original está disponível no [Github](https://github.com/Snigdho8869/Multiclass-Text-Classification/blob/main/Notebook/Multiclass_Text_Classification.ipynb) e, a partir dela, foram utilizadas as melhores práticas de Machine Learning Operations (MLOps) vistas no [primeiro projeto](../Python_Essentials_for_MLOps/). O conjunto de dados BBC-text é uma coleção de notícias coletadas pela BBC entre 2004 e 2005 e pode ser encontrado no site do [Hugging Face](https://www.kaggle.com/code/yufengdev/bbc-text-categorization). Ao todo, ele possui 2.225 documentos e duas colunas:
+In this project, a pipeline was developed for the multiclass classification of texts using [MLFlow](https://mlflow.org/) to orchestrate the execution of scripts and [Gradio](https://www.gradio.app/) to consume the model and make inferences. The original solution is available on [Github](https://github.com/Snigdho8869/Multiclass-Text-Classification/blob/main/Notebook/Multiclass_Text_Classification.ipynb), and from it, the best practices of Machine Learning Operations (MLOps) seen in the [first project](../Python_Essentials_for_MLOps/) were utilized. The dataset used is the BBC-text, a collection of news gathered by the BBC between 2004 and 2005. It can be found on the [Hugging Face](https://www.kaggle.com/code/yufengdev/bbc-text-categorization) website. The dataset consists of 2,225 documents and two columns:
 
-- `category`: Contém os rótulos dos textos (`sport`, `business`, `politics`, `tech`, `entertainment`)
-- `text`: Contém o texto das notícias coletadas.
+- `category`: Contains the labels of the texts (`sport`, `business`, `politics`, `tech`, `entertainment`)
+- `text`: Contains the text of the collected news.
 
 ## Pipeline
 
-Ao todo, o pipeline desenvolvido consistem em seis passos, onde uma caixa em verde representa um script executado e em azul representa o artefato de saída daquele passo. Na última parte, o artefato do modelo treinado é consumido pelo Gradio para que um usuário possa realizar inferências a partir de um texto. A figura abaixo demonstra o pipeline completo.
+The developed pipeline consists of six steps in total, where a green box represents an executed script, and a blue box represents the output artifact of that step. In the final part, the artifact of the trained model is consumed by Gradio, allowing a user to make inferences from a given text. The figure below illustrates the complete pipeline.
 
-![alt text](./images/pipeline.png)
+<div align="center">
+  <img src="./images/pipeline.png" alt="Category">
+</div>
 
 ### Fetch Data
 
-O primeiro passo consiste na aquisição dos dados a partir de uma fonte. Nesse caso, está sendo realizada uma requisição get do site do Hugging Face, mas esse passo pode ser generalizado para realizar o download dos dados de qualquer fonte, seja Amazon, Firestore, Google Cloud Platform etc. A saída deste passo é o dado bruto puxado da fonte.
+The first step involves acquiring data from a source. In this case, a GET request is made to the Hugging Face website. However, this step can be generalized to download data from any source, whether it be Amazon, Firestore, Google Cloud Platform, etc. The output of this step is the raw data pulled from the source.
 
 ### EDA
 
-A análise exploratória dos dados utiliza os dados brutos como entrada e nela é possível gerar gráficos com a proporção dos rótulos em cada classe, a distribuição estatística das variáveis numéricas, entre outras análises. Nesse caso, como o dataset possui apenas duas colunas, gerou-se apenas um gráfico com a distribuição dos rótulos. Ao final, este passo não gera nenhum artefato no pipeline.
+The exploratory data analysis (EDA) utilizes the raw data as input, allowing the generation of various graphs such as the proportion of labels in each class, the statistical distribution of numeric variables, among other analyses. In this case, as the dataset has only two columns, a graph depicting the distribution of labels was generated. Importantly, this step does not produce any artifact in the pipeline.
 
-### Preprocessing
+<div align="center">
+  <img src="./figures/category.png" alt="Category">
+</div>
 
-Este passo também recebe como entrada os dados brutos e é responsável por deixar os dados limpos. Neste caso, todo o texto está sendo colocado em minúsculo, as pontuações e as stopwords estão sendo removidas e, por fim, é realizada a tokenização das palavras.
+### Step 3: Preprocessing
 
-### Data Checks
+This step also takes the raw data as input and is responsible for cleaning the data. In this case, all text is converted to lowercase, punctuation and stopwords are removed, and finally, word tokenization is performed.
 
-Este passo recebe como entrada os dados limpos do passo anterior e não gera artefato ao final da sua execução. Ele é responsável por realizar testes utilizando o Pytest para verificar se os dados estão como esperado para que possa seguir para os próximos passos. Por exemplo, as colunas possuem rótulos esperados? Os nomes das colunas estão corretos? O conjunto de dados é grande o suficiente para treinar o modelo? Entre outros testes.
+### Step 4: Data Checks
 
-### Data Segregation
+This step takes the cleaned data from the previous step as input and does not generate any artifact at the end of its execution. It is responsible for running tests using Pytest to verify if the data is as expected, ensuring it can proceed to the next steps. For example, do the columns have expected labels? Are the column names correct? Is the dataset large enough to train the model? Among other tests.
 
-Este passo recebe como entrada os dados limpos e tem como objetivo realizar a divisão entre treinamento e teste. Em partiular, neste caso está sendo realizada uma divisão na proporção de 80% para treinamento e 20% para teste. Nesse sentido, os conjuntos de dados ficaram com respectivamente 1780 e 445 samples.
+### Step 5: Data Segregation
 
-### Train
+This step takes the cleaned data as input and aims to perform the split between training and testing. In this case, a split of 80% for training and 20% for testing is performed. Thus, the datasets have 1780 and 445 samples, respectively.
 
-Este passo recebe os conjuntos de dados divididos anteriormente e realiza o treinamento de um modelo Bert por três épocas. A saída deste passo é justamente o artefato do modelo treinado, o qual é consumido posteriormente pelo Gradio.
+### Step 6: Train
+
+This step receives the datasets divided in the previous step and carries out the training of a Bert model for three epochs. The output of this step is precisely the artifact of the trained model, which is subsequently consumed by Gradio.
 
 ## Results
 
-O treinamento do modelo Bert resultou nas seguintes métricas:
+The training of the Bert model resulted in the following metrics:
 
-loss: 0.0200 - accuracy: 0.9955 - val_loss: 0.0447 - val_accuracy: 0.9910
+- **Train loss**: 0.0200
+- **Train accuracy**: 0.9955
+- **Validation loss**: 0.0447
+- **Validation accuracy**: 0.9910
 
-O gráfico da acurácia e do custo ao longo das épocas pode ser visto abaixo.
+### Training Visualization
 
-![alt text](./figures/acc_loss_graph.png)
+<div align="center">
+  <img src="./figures/acc_loss_graph.png" alt="Accuracy and Loss Graph">
+</div>
 
-A matriz de confusão resultante pode ser vista abaixo.
+### Confusion Matrix
 
-![alt text](./figures/confusion_matrix.png)
+<div align="center">
+  <img src="./figures/confusion_matrix.png" alt="Confusion Matrix">
+</div>
 
-## How to execute 
-1 - Crie o ambiente virtual
+## Gradio
+
+With the model saved, Gradio can load it and perform inferences from an input text. In the example below, the input was a text that talks about politics and, when making the prediction, the model categorized it accurately.
+
+<div align="center">
+  <img src="./images/gradio.jpeg" alt="Gradio">
+</div>
+
+## How to execute
+
+1 - Create the virtual environment
 
 ```bash
 conda env create -f environment.yml
 ```
 
-2 - Abra um terminal e execute o server do mlflow
+2 - Open a terminal and run the mlflow server
 
 ```bash
 mlflow server --host 127.0.0.1 --port 5000
 ```
 
-3 - Em outro terminal, execute o arquivo `main.py`
+3 - In another terminal, run the `main.py` file
 
 ```bash
 python main.py
 ```
 
-4 - Execute o Gradio
+4 - Execute Gradio
 
 ```bash
 python app.py
@@ -78,8 +100,7 @@ python app.py
 
 ## Copyrights
 
-Esse projeto foi adaptado de uma solução encontrada no [Github](https://github.com/Snigdho8869/Multiclass-Text-Classification/blob/main/Notebook/Multiclass_Text_Classification.ipynb). As modificações realizadas incluem um fluxo de execução contínuo e segmentato em blocos, onde cada um possui uma função específica e a aplicação das melhores práticas de código limpo, linting etc.
-
+This project was adapted from a solution found on [Github](https://github.com/Snigdho8869/Multiclass-Text-Classification/blob/main/Notebook/Multiclass_Text_Classification.ipynb). The modifications made include a continuous and segmented execution flow, where each block has a specific function, and the application of best practices such as clean code, linting, etc.
 ## References 
 
 - [Ivanovitch's Repository](https://github.com/ivanovitchm/mlops)

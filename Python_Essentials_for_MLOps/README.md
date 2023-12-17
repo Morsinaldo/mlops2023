@@ -70,11 +70,6 @@ With this in mind, three projects have been developed to explore some of these b
 
 ### Virtual Environment
 
-Hoje em dia, utiliza-se muito cloud computing para hospedar aplicações e isso possui um custo associado. Então, quanto menos dependências a aplicação tiver, melhor. Nesse sentido, a criação de um ambiente virtual simula uma "caixa de areia" que contém as dependências que irão ser necessárias para a aplicação executar da forma correta. Além disso, a criação desse ambiente evita que uma bilbioteca específica de um projeto apresente conflito com uma bilbioteca de outro projeto, por exemplo.
-
-Para tratar isso, existem alguns gerenciadores de pacotes que facilitam o tratamento desses conflitos. Como sugestão, eu apresento o [Anaconda](https://anaconda.org), o [Poetry](https://python-poetry.org) e o [Python Venv](https://docs.python.org/3/library/venv.html).
-
-
 These days, cloud computing is widely used to host applications, and it comes with associated costs. Therefore, the fewer dependencies an application has, the better. In this regard, creating a virtual environment simulates a "sandbox" that contains the dependencies needed for the application to run correctly. Moreover, creating this environment prevents a specific library from one project from conflicting with a library from another project, for example.
 
 To address this, there are package managers that make handling these conflicts easier. As a suggestion, I present [Anaconda](https://anaconda.org), [Poetry](https://python-poetry.org), and [Python Venv](https://docs.python.org/3/library/venv.html).
@@ -100,7 +95,7 @@ Once we agree to write scripts, what's the best way to do it? It's not just abou
 4. **Efficient code and documentation**: Knowing how to write code that runs efficiently is another essential skill in software development. Note that one point is related to the other. The example above also applies to this one. When you're performing lots of different transformations on large amounts of data, this can make orders of magnitude of difference in performance.
 
 5. **Documentation**: It's fundamental for someone reading your code. How can someone who has never seen your code before look at it and understand what you did in a simple way? Concise one-line comments can be very useful to explain what a command does, and docstrings for functions and classes using data type annotations greatly facilitate understanding the purpose of that entity.
-6. Following PEPs: Python Enhancement Proposals (PEP) is a set of guidelines and recommendations for writing Python code in a clearer, more readable, and consistent manner. It defines a coding style that helps developers produce more organized and easily understandable code. Some notable PEPs include:
+6. **Following PEPs**: Python Enhancement Proposals (PEP) is a set of guidelines and recommendations for writing Python code in a clearer, more readable, and consistent manner. It defines a coding style that helps developers produce more organized and easily understandable code. Some notable PEPs include:
 
    - [PEP 8 – Style Guide for Python Code](https://peps.python.org/pep-0008/)
    - [PEP 3107 – Function Annotations](https://peps.python.org/pep-3107/)
