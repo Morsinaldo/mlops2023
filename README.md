@@ -11,7 +11,7 @@ MLOps, or Machine Learning Operations, is the practice of streamlining the entir
 
 - [Python Essentials for MLOps](./Python_Essentials_for_MLOps/)
 - [Classifying Tweets](./Classifying_Tweets/)
-= [Multiclass Text Classification](./Multiclass-Text-Classification/)
+- [Multiclass Text Classification](./Multiclass-Text-Classification/)
 
 🔜 More content will be added as the course progresses.
 
