@@ -1,7 +1,11 @@
+"""
+Python file to train the model.
+"""
+
 import os
+import logging
 import ktrain
 import mlflow
-import logging
 
 import pandas as pd
 import seaborn as sns
@@ -9,13 +13,16 @@ import matplotlib.pyplot as plt
 
 from ktrain import text
 from mlflow import tracking
+from requests.exceptions import RequestException
 
 sns.set_theme(style="whitegrid")
 
 # configure logging
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s %(message)s",
-                    datefmt='%d-%m-%Y %H:%M:%S')
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(message)s",
+    datefmt='%d-%m-%Y %H:%M:%S'
+)
 
 # reference for a logging obj
 logger = logging.getLogger()
@@ -37,11 +44,14 @@ def get_segregated_data_artifact():
     # Get the experiment by name
     experiment = client.get_experiment_by_name(experiment_name)
     if experiment is None:
-        raise Exception(f"The experiment '{experiment_name}' does not exist.")
+        raise RequestException(f"The experiment '{experiment_name}' does not exist.")
 
     # Search for the latest runs in the experiment
-    runs = client.search_runs(experiment_ids=[experiment.experiment_id], order_by=["attributes.start_time DESC"])
-    
+    runs = client.search_runs(
+        experiment_ids=[experiment.experiment_id],
+        order_by=["attributes.start_time DESC"]
+    )
+
     if runs:
 
         # search for the run with the name 'data_segregation'
@@ -61,7 +71,7 @@ def get_segregated_data_artifact():
         client.download_artifacts(run_id, "X_test.csv", data_dir)
         client.download_artifacts(run_id, "y_test.csv", data_dir)
     else:
-        raise Exception(f"No runs found for experiment '{experiment_name}'.")
+        raise RequestException(f"No runs found for experiment '{experiment_name}'.")
 
 
 def train(artifact_folder: str, figures_folder: str):
@@ -105,12 +115,16 @@ def train(artifact_folder: str, figures_folder: str):
 
         # load data
         logger.info("Loading the data...")
-        (x_train,y_train), (x_val,y_val), preproc = text.texts_from_array(x_train=X_train, y_train=y_train,
-                                                                       x_test=X_test, y_test=y_test,
-                                                                       class_names=class_names,
-                                                                       preprocess_mode='bert',
-                                                                       maxlen=512, 
-                                                                       max_features=20000)
+        (x_train, y_train), (x_val, y_val), preproc = text.texts_from_array(
+            x_train=X_train,
+            y_train=y_train,
+            x_test=X_test,
+            y_test=y_test,
+            class_names=class_names,
+            preprocess_mode='bert',
+            maxlen=512,
+            max_features=20000
+        )
 
         # load model
         logger.info("Loading the model...")
@@ -118,9 +132,12 @@ def train(artifact_folder: str, figures_folder: str):
 
         # wrap model and data in ktrain.Learner object
         logger.info("Wrapping the model...")
-        learner = ktrain.get_learner(model, train_data=(x_train,y_train), 
-                                    val_data=(x_val,y_val),
-                                    batch_size=6)
+        learner = ktrain.get_learner(
+            model,
+            train_data=(x_train, y_train),
+            val_data=(x_val, y_val),
+            batch_size=6
+        )
 
         # fit the model
         logger.info("Fitting the model...")
@@ -139,12 +156,18 @@ def train(artifact_folder: str, figures_folder: str):
         # plot the confusion matrix
         logger.info("Plotting the confusion matrix...")
 
-        confusion_array = learner.validate(val_data=(x_val,y_val), class_names=class_names)
+        confusion_array = learner.validate(val_data=(x_val, y_val), class_names=class_names)
 
         # create the figure
         plt.figure(figsize=(8, 6))
-        sns.heatmap(confusion_array, annot=True, fmt="d", cmap="Blues",
-                    xticklabels=class_names, yticklabels=class_names)
+        sns.heatmap(
+            confusion_array,
+            annot=True,
+            fmt="d",
+            cmap="Blues",
+            xticklabels=class_names,
+            yticklabels=class_names
+        )
         plt.title("Confusion Matrix")
         plt.xlabel("Predicted Class")
         plt.ylabel("True Class")
@@ -154,11 +177,11 @@ def train(artifact_folder: str, figures_folder: str):
 
         # save the model
         predictor = ktrain.get_predictor(learner.model, preproc)
-        predictor.save("bert_trained")
+        predictor.save(f"./{artifact_folder}/bert_trained")
 
         # log the artifact
         logger.info("Logging the artifacts...")
-        mlflow.log_artifact("bert_trained")
+        mlflow.log_artifact(f"./{artifact_folder}/bert_trained")
 
         # log the confusion matrix
         mlflow.log_artifact(f"./{figures_folder}/confusion_matrix.png")

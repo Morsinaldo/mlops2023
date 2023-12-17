@@ -1,22 +1,27 @@
+"""
+Python file to perform exploratory data analysis (EDA).
+"""
+
 import os
-import mlflow
 import logging
+import mlflow
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-
 from mlflow import tracking
+from requests.exceptions import RequestException
 
 sns.set_theme(style="whitegrid")
 
 # configure logging
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s %(message)s",
-                    datefmt='%d-%m-%Y %H:%M:%S')
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(message)s",
+    datefmt='%d-%m-%Y %H:%M:%S'
+)
 
 # reference for a logging obj
 logger = logging.getLogger()
-
 
 def get_raw_data_artifact():
     """
@@ -34,12 +39,16 @@ def get_raw_data_artifact():
 
     # Get the experiment by name
     experiment = client.get_experiment_by_name(experiment_name)
+
     if experiment is None:
-        raise Exception(f"The experiment '{experiment_name}' does not exist.")
+        raise RequestException(f"The experiment '{experiment_name}' does not exist.")
 
     # Search for the latest runs in the experiment
-    runs = client.search_runs(experiment_ids=[experiment.experiment_id], order_by=["attributes.start_time DESC"])
-    
+    runs = client.search_runs(
+        experiment_ids=[experiment.experiment_id],
+        order_by=["attributes.start_time DESC"]
+    )
+
     if runs:
 
         # search for the run with the name 'fetch_data'
@@ -56,7 +65,7 @@ def get_raw_data_artifact():
         # Download the artifact
         client.download_artifacts(run_id, "bbc-text.csv", data_dir)
     else:
-        raise Exception(f"No runs found for experiment '{experiment_name}'.")
+        raise RequestException(f"No runs found for experiment '{experiment_name}'.")
 
 def eda(figures_folder: str, artifact_folder: str):
     """
@@ -86,26 +95,31 @@ def eda(figures_folder: str, artifact_folder: str):
 
         # read raw data artifact
         try:
-            df=pd.read_csv(f"{artifact_folder}/bbc-text.csv", engine='python', encoding='UTF-8')
-        except Exception as e:
-            logger.error(e)
+            df = pd.read_csv(f"{artifact_folder}/bbc-text.csv", engine='python', encoding='UTF-8')
+        except FileNotFoundError as e:
+            logger.error("File not found: %s", e)
+        except pd.errors.EmptyDataError as e:
+            logger.error("Empty data file: %s", e)
+        except pd.errors.ParserError as e:
+            logger.error("Parser error: %s", e)
+        except IOError as e:
+            logger.error("IO error: %s", e)
+        else:
+            logger.info(df.head())
+            logger.info("Shape of the data: %s", df.shape)
 
-        logger.info(df.head())
+            if not os.path.exists(figures_folder):
+                os.makedirs(figures_folder)
 
-        logger.info(f"Shape of the data: {df.shape}")
+            # plot the label distribution
+            logger.info("Plotting the label distribution...")
+            sns.set_theme(style="whitegrid")
+            plt.figure(figsize=(10, 5))
+            sns.countplot(x="category", data=df)
+            plt.xticks(rotation=45)
+            plt.tight_layout()
+            plt.savefig(f"{figures_folder}/category.png")
 
-        if not os.path.exists(figures_folder):
-            os.makedirs(figures_folder)
-
-        # plot the label distribution
-        logger.info("Plotting the label distribution...")
-        sns.set_theme(style="whitegrid")
-        plt.figure(figsize=(10, 5))
-        sns.countplot(x="category", data=df)
-        plt.xticks(rotation=45)
-        plt.tight_layout()
-        plt.savefig(f"{figures_folder}/category.png")
-
-        # log the artifact
-        logger.info("Logging the artifacts...")
-        mlflow.log_artifact(f"{figures_folder}/category.png")
+            # log the artifact
+            logger.info("Logging the artifacts...")
+            mlflow.log_artifact(f"{figures_folder}/category.png")

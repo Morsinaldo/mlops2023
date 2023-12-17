@@ -1,7 +1,11 @@
+"""
+Python file to preprocess the data.
+"""
+
 import re
+import logging
 import nltk
 import mlflow
-import logging
 import pandas as pd
 
 from textblob import Word
@@ -53,31 +57,85 @@ def preprocessing(artifact_folder: str):
         logger.info("Reading the raw data...")
         try:
             df=pd.read_csv(f"{artifact_folder}/bbc-text.csv", engine='python', encoding='UTF-8')
-        except Exception as e:
+        except pd.errors.DataError as e:
             logger.error(e)
 
         # Preprocessing
         logger.info("Preprocessing the data...")
-        df['text']=df['text'].fillna("") 
+        df['text']=df['text'].fillna("")
         logger.info(df.isna().sum())
 
-        df['lower_case'] = df['text'].apply(lambda x: x.lower().strip().replace('\n', ' ').replace('\r', ' '))
+        df['lower_case'] = df['text'].apply(
+            lambda x: x.lower().strip().replace('\n', ' ').replace('\r', ' ')
+        )
 
-        df['alphabatic'] = df['lower_case'].apply(lambda x: re.sub(r'[^a-zA-Z\']', ' ', x)).apply(lambda x: re.sub(r'[^\x00-\x7F]+', '', x))
-        df['without-link'] = df['alphabatic'].apply(lambda x: re.sub(r'http\S+', '', x))
+        df['alphabatic'] = df['lower_case'].apply(
+            lambda x: re.sub(r'[^a-zA-Z\']', ' ', x)
+        ).apply(
+            lambda x: re.sub(r'[^\x00-\x7F]+', '', x)
+        )
+
+        df['without-link'] = df['alphabatic'].apply(
+            lambda x: re.sub(r'http\S+', '', x)
+        )
 
         tokenizer = RegexpTokenizer(r'\w+')
-        df['Special_word'] = df.apply(lambda row: tokenizer.tokenize(row['lower_case']), axis=1)  
 
-        stop = [word for word in stopwords.words('english') if word not in ["my","haven't","aren't","can","no", "why", "through", "herself", "she", "he", "himself", "you", "you're", "myself", "not", "here", "some", "do", "does", "did", "will", "don't", "doesn't", "didn't", "won't", "should", "should've", "couldn't", "mightn't", "mustn't", "shouldn't", "hadn't", "wasn't", "wouldn't"]]
+        df['Special_word'] = df.apply(
+            lambda row: tokenizer.tokenize(row['lower_case']),
+            axis=1
+        )
 
-        df['stop_words'] = df['Special_word'].apply(lambda x: [item for item in x if item not in stop])
+        stop_list = [
+            "my",
+            "haven't",
+            "aren't",
+            "can",
+            "no",
+            "why",
+            "through",
+            "herself",
+            "she",
+            "he",
+            "himself",
+            "you",
+            "you're",
+            "myself",
+            "not",
+            "here",
+            "some",
+            "do",
+            "does",
+            "did",
+            "will",
+            "don't",
+            "doesn't",
+            "didn't",
+            "won't",
+            "should",
+            "should've",
+            "couldn't",
+            "mightn't",
+            "mustn't",
+            "shouldn't",
+            "hadn't",
+            "wasn't",
+            "wouldn't"
+        ]
+
+        stop = [word for word in stopwords.words('english') if word not in stop_list]
+
+        df['stop_words'] = df['Special_word'].apply(
+            lambda x: [item for item in x if item not in stop]
+        )
+
         df['stop_words'] = df['stop_words'].astype('str')
+        df['short_word'] = df['stop_words'].str.findall(r'\w{2,}')
+        df['string'] = df['short_word'].str.join(' ')
 
-        df['short_word'] = df['stop_words'].str.findall('\w{2,}')
-        df['string']=df['short_word'].str.join(' ') 
-        
-        df['Text'] = df['string'].apply(lambda x: " ".join([Word(word).lemmatize() for word in x.split()])) 
+        df['Text'] = df['string'].apply(
+            lambda x: " ".join([Word(word).lemmatize() for word in x.split()])
+        )
 
         # save the preprocessed data
         logger.info("Saving the preprocessed data...")

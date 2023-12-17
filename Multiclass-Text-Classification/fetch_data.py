@@ -1,6 +1,10 @@
+"""
+Python file to download the data from the url and save it in the artifact folder.
+"""
+
 import os
-import mlflow
 import logging
+import mlflow
 import requests
 
 # configure logging
@@ -15,7 +19,7 @@ logger = logging.getLogger()
 
 def fetch_data(url: str, artifact_folder: str):
     """
-    Download the data from the url and save it in the artifact folder.
+    Download the data from the URL and save it in the artifact folder.
 
     Parameters
     ----------
@@ -24,34 +28,33 @@ def fetch_data(url: str, artifact_folder: str):
     artifact_folder : str
         Folder to save the data.
     """
-    # Set our tracking server uri for logging
+    # Set our tracking server URI for logging
     mlflow.set_tracking_uri(uri="http://127.0.0.1:5000")
 
     # Create a new MLflow Experiment
     mlflow.set_experiment("Multiclass Text Classification")
 
     with mlflow.start_run(run_name="fetch_data"):
- 
         if not os.path.exists(artifact_folder):
             os.makedirs(artifact_folder)
 
-        # Download the data
         try:
-            requests.get(url)
-
             # Download the data
             logger.info("Downloading the data...")
-            data = requests.get(url).content
+            response = requests.get(url, timeout=10)
 
-            # Save the data
-            logger.info("Saving the data...")
-            with open(f"{artifact_folder}/bbc-text.csv", "wb") as f:
-                f.write(data)
-        except Exception as e:
-            logger.error(e)
+            if response.status_code == 200:
+                data = response.content
 
-        # log the artifact
+                # Save the data
+                logger.info("Saving the data...")
+                with open(f"{artifact_folder}/bbc-text.csv", "wb") as f:
+                    f.write(data)
+            else:
+                logger.error("Failed to download data. Status code: %s", response.status_code)
+        except requests.exceptions.RequestException as e:
+            logger.error("Failed to download data. Error: %s", e)
+
+        # Log the artifact
         mlflow.log_artifact(f"{artifact_folder}/bbc-text.csv")
         logger.info("Data downloaded successfully!")
-
-    

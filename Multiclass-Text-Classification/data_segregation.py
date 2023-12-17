@@ -1,22 +1,31 @@
+"""
+Python file to segregate the data into train and test.
+"""
+
 import os
-import ktrain
-import mlflow
 import logging
+import mlflow
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from requests.exceptions import RequestException
 
 from mlflow import tracking
 
 # configure logging
-logging.basicConfig(level=logging.INFO,
-                    format="%(asctime)s %(message)s",
-                    datefmt='%d-%m-%Y %H:%M:%S')
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(message)s",
+    datefmt='%d-%m-%Y %H:%M:%S'
+)
 
 # reference for a logging obj
 logger = logging.getLogger()
 
 def get_clean_data_artifact():
+    """
+    Download the clean data artifact from the MLflow server.
+    """
     # Set our tracking server uri for logging
     mlflow.set_tracking_uri(uri="http://127.0.0.1:5000")
 
@@ -28,12 +37,16 @@ def get_clean_data_artifact():
 
     # Get the experiment by name
     experiment = client.get_experiment_by_name(experiment_name)
+
     if experiment is None:
-        raise Exception(f"The experiment '{experiment_name}' does not exist.")
+        raise RequestException(f"The experiment '{experiment_name}' does not exist.")
 
     # Search for the latest runs in the experiment
-    runs = client.search_runs(experiment_ids=[experiment.experiment_id], order_by=["attributes.start_time DESC"])
-    
+    runs = client.search_runs(
+        experiment_ids=[experiment.experiment_id],
+        order_by=["attributes.start_time DESC"]
+    )
+
     if runs:
 
         # search for the run with the name 'preprocessing'
@@ -50,7 +63,7 @@ def get_clean_data_artifact():
         # Download the artifact
         client.download_artifacts(run_id, "bbc-text-preprocessed.csv", data_dir)
     else:
-        raise Exception(f"No runs found for experiment '{experiment_name}'.")
+        raise RequestException(f"No runs found for experiment '{experiment_name}'.")
 
 def data_segregation(artifact_folder: str):
     """
@@ -74,21 +87,30 @@ def data_segregation(artifact_folder: str):
     logger.info("Raw data artifact downloaded successfully!")
 
     with mlflow.start_run(run_name="data_segregation"):
-        
+
         logger.info("Reading the data...")
         try:
-            df=pd.read_csv(f"{artifact_folder}/bbc-text-preprocessed.csv", engine='python', encoding='UTF-8')
-        except Exception as e:
+            df=pd.read_csv(
+                f"{artifact_folder}/bbc-text-preprocessed.csv",
+                engine='python',
+                encoding='UTF-8'
+            )
+        except pd.errors.EmptyDataError as e:
             logger.error(e)
 
         # split the data
         logger.info("Splitting the data...")
-        X_train, X_test, y_train, y_test = train_test_split(df['text'], df['category'], test_size=0.20, random_state=42)
+        X_train, X_test, y_train, y_test = train_test_split(
+            df['text'],
+            df['category'],
+            test_size=0.20,
+            random_state=42
+        )
 
-        logger.info(f"Shape of the X_train: {X_train.shape}")
-        logger.info(f"Shape of the X_test: {X_test.shape}")
-        logger.info(f"Shape of the y_train: {y_train.shape}")
-        logger.info(f"Shape of the y_test: {y_test.shape}")
+        logger.info("Shape of the X_test: %s", X_test.shape)
+        logger.info("Shape of the y_train: %s", y_train.shape)
+        logger.info("Shape of the X_test: %s", X_test.shape)
+        logger.info("Shape of the y_test: %s", y_test.shape)
 
         X_train.to_csv(f"{artifact_folder}/X_train.csv")
         y_train.to_csv(f"{artifact_folder}/y_train.csv")

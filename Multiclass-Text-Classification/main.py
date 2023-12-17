@@ -1,3 +1,7 @@
+"""
+Python file to run all the steps in the pipeline.
+"""
+
 from fetch_data import fetch_data
 from eda import eda
 from preprocessing import preprocessing
